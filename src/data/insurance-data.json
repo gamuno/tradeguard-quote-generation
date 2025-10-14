@@ -1,0 +1,198 @@
+{
+  "client": {
+    "name": "Labor Tech Solutions",
+    "address": "123 Business Ave, Atlanta, GA 30309",
+    "industry": "Technology Consulting"
+  },
+  "agent": {
+    "name": "Garrett Amundsen",
+    "company": "TradeGuard Insurance",
+    "phone": "912-689-5474",
+    "email": "garrett@tradeguardins.com",
+    "address": "456 Insurance Blvd, Savannah, GA 31401",
+    "headshotUrl": "https://files.manuscdn.com/user_upload_by_module/session_file/97407341/VqAZctcWvQFYkypv.png"
+  },
+  "carrier": {
+    "name": "Chubb",
+    "amRating": "A++",
+    "financialStrength": "Superior"
+  },
+  "quote": {
+    "number": "CHB-2025-001234",
+    "date": "2025-09-26",
+    "validity": "90 Days",
+    "effectiveDate": "October 1, 2025 - October 1, 2026",
+    "expirationDate": "October 1, 2026"
+  },
+  "branding": {
+    "primaryColor": "#FF5F46",
+    "logoUrl": "https://files.manuscdn.com/user_upload_by_module/session_file/97407341/MWFfXxmBoovFpYsV.png"
+  },
+  "webhook": {
+    "url": "https://hook.us2.make.com/w8rl7tx7kwakoheacif94hyb8eksd0hr",
+    "apiKey": "manus-quote-generation"
+  },
+  "policies": [
+    {
+      "id": "bop",
+      "name": "Business Owner's Policy",
+      "shortName": "BOP",
+      "description": "Foundation business protection",
+      "fullDescription": "Comprehensive business protection combining general liability, property, and business income coverage in one convenient policy.",
+      "icon": "Building",
+      "color": "bg-blue-500",
+      "premium": 513,
+      "limits": {
+        "generalLiability": 1000000,
+        "aggregate": 2000000,
+        "property": 500000,
+        "businessIncome": 250000,
+        "cyber": 100000,
+        "employmentPractices": 25000,
+        "total": 3875000
+      },
+      "deductibles": {
+        "property": 1000,
+        "generalLiability": 0,
+        "cyber": 1000
+      },
+      "keyFeatures": [
+        "General liability protection up to $1M per occurrence",
+        "Property coverage for building and contents",
+        "Business income protection for lost revenue",
+        "Limited cyber liability coverage included",
+        "Employment practices liability coverage",
+        "Professional liability for incidental services"
+      ],
+      "coverageExamples": {
+        "covered": [
+          "Client slips and falls at your office during consultation",
+          "Employee files discrimination lawsuit",
+          "Data breach exposes client contact information",
+          "Advertising campaign uses copyrighted material",
+          "Fire damages rented office space"
+        ],
+        "notCovered": [
+          "Ransomware attack encrypts company data",
+          "COVID-19 outbreak traced to office",
+          "Environmental contamination from operations",
+          "Professional errors in consulting advice",
+          "Cyber attack takes down website"
+        ]
+      }
+    },
+    {
+      "id": "umbrella",
+      "name": "Commercial Umbrella",
+      "shortName": "Umbrella",
+      "description": "Additional liability protection",
+      "fullDescription": "Excess liability coverage that provides additional protection above your primary policies when claims exceed underlying limits.",
+      "icon": "Umbrella",
+      "color": "bg-green-500",
+      "premium": 735,
+      "limits": {
+        "excessLiability": 1000000,
+        "total": 1000000
+      },
+      "deductibles": {
+        "selfInsuredRetention": 0
+      },
+      "keyFeatures": [
+        "$1M excess liability protection",
+        "Covers over BOP general liability",
+        "Worldwide territory coverage",
+        "Defense cost coverage included",
+        "Broad form coverage with minimal exclusions",
+        "No self-insured retention required"
+      ],
+      "coverageExamples": {
+        "covered": [
+          "Large lawsuit exceeds $1M BOP limit",
+          "Product liability claim for consulting project",
+          "International client sues for $2M",
+          "Multiple claims exhaust BOP aggregate"
+        ],
+        "notCovered": [
+          "Company vehicle accident damages",
+          "Employee work-related injury lawsuit",
+          "Data breach lawsuit (privacy exclusion)",
+          "Liquor-related incident at company event"
+        ]
+      }
+    },
+    {
+      "id": "professional",
+      "name": "Professional E&O",
+      "shortName": "Professional",
+      "description": "Technology & professional liability",
+      "fullDescription": "Specialized professional liability and cyber coverage designed for technology consultants and professional service providers.",
+      "icon": "Laptop",
+      "color": "bg-purple-500",
+      "premium": 915,
+      "limits": {
+        "professionalLiability": 1000000,
+        "aggregate": 1000000,
+        "cyberLiability": 1000000,
+        "dataBreachResponse": 1000000,
+        "total": 1000000
+      },
+      "deductibles": {
+        "professionalLiability": 1000,
+        "cyberLiability": 1000
+      },
+      "keyFeatures": [
+        "Professional liability for consulting errors",
+        "Comprehensive cyber liability coverage",
+        "Data breach response and notification costs",
+        "Regulatory defense and fines coverage",
+        "Business interruption from cyber events",
+        "Third-party cyber liability protection"
+      ],
+      "coverageExamples": {
+        "covered": [
+          "Consulting advice leads to client financial loss",
+          "Ransomware attack demands payment",
+          "Data breach triggers regulatory investigation",
+          "Employee falls for phishing scam",
+          "Website content infringes copyright"
+        ],
+        "notCovered": [
+          "Intentionally collecting data without consent",
+          "Securities fraud in investment advice",
+          "Environmental consulting pollution",
+          "Known problems before policy inception"
+        ]
+      }
+    }
+  ],
+  "comparisonMatrix": [
+    {
+      "coverageArea": "General Liability",
+      "policies": ["$1M / $2M", "+$1M Excess", "Not Covered"]
+    },
+    {
+      "coverageArea": "Professional Liability",
+      "policies": ["Not Covered", "Not Covered", "$1M / $1M"]
+    },
+    {
+      "coverageArea": "Cyber & Privacy",
+      "policies": ["$100K Limited", "Excluded", "$1M Comprehensive"]
+    },
+    {
+      "coverageArea": "Employment Practices",
+      "policies": ["$25K", "Excluded", "Not Covered"]
+    },
+    {
+      "coverageArea": "Property Coverage",
+      "policies": ["$500K", "Not Covered", "Not Covered"]
+    },
+    {
+      "coverageArea": "Deductible/Retention",
+      "policies": ["$1,000", "$0", "$1,000"]
+    },
+    {
+      "coverageArea": "Annual Premium",
+      "policies": ["$513", "$735", "$915"]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+
+
+  VITE v6.3.7  ready in 169 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+10:25:06 AM [vite] (client) hmr update /src/App.jsx, /src/index.css, /src/App.css
+10:25:14 AM [vite] (client) hmr update /src/App.jsx, /src/index.css, /src/App.css (x2)
+10:25:21 AM [vite] (client) hmr update /src/App.jsx, /src/index.css, /src/App.css (x3)
+10:25:37 AM [vite] (client) hmr update /src/App.jsx, /src/index.css, /src/App.css (x4)
+10:27:21 AM [vite] (client) hmr update /src/App.jsx, /src/index.css, /src/App.css (x5)
+10:27:45 AM [vite] (client) hmr update /src/App.jsx, /src/index.css, /src/App.css (x6)
+10:28:16 AM [vite] (client) hmr update /src/App.jsx, /src/index.css, /src/App.css (x7)
+npm run dev
+^Cnpm run build
+
+npm run build
+

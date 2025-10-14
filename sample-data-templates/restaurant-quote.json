@@ -1,0 +1,202 @@
+{
+  "client": {
+    "name": "Mario's Italian Restaurant",
+    "address": "789 Main Street, Chicago, IL 60601",
+    "industry": "Restaurant & Food Service"
+  },
+  "agent": {
+    "name": "Garrett Amundsen",
+    "company": "TradeGuard Insurance",
+    "phone": "912-689-5474",
+    "email": "garrett@tradeguardins.com",
+    "address": "456 Insurance Blvd, Savannah, GA 31401",
+    "headshotUrl": "https://files.manuscdn.com/user_upload_by_module/session_file/97407341/VqAZctcWvQFYkypv.png"
+  },
+  "carrier": {
+    "name": "Travelers",
+    "amRating": "A++",
+    "financialStrength": "Superior"
+  },
+  "quote": {
+    "number": "TRV-2025-005678",
+    "date": "2025-10-14",
+    "validity": "60 Days",
+    "effectiveDate": "November 1, 2025 - November 1, 2026",
+    "expirationDate": "November 1, 2026"
+  },
+  "branding": {
+    "primaryColor": "#FF5F46",
+    "logoUrl": "https://files.manuscdn.com/user_upload_by_module/session_file/97407341/MWFfXxmBoovFpYsV.png"
+  },
+  "webhook": {
+    "url": "https://hook.us2.make.com/w8rl7tx7kwakoheacif94hyb8eksd0hr",
+    "apiKey": "manus-quote-generation"
+  },
+  "policies": [
+    {
+      "id": "bop",
+      "name": "Business Owner's Policy",
+      "shortName": "BOP",
+      "description": "Restaurant business protection",
+      "fullDescription": "Comprehensive business protection designed specifically for restaurants, including general liability, property, and business income coverage.",
+      "icon": "Building",
+      "color": "bg-blue-500",
+      "premium": 2850,
+      "limits": {
+        "generalLiability": 1000000,
+        "aggregate": 2000000,
+        "property": 750000,
+        "businessIncome": 500000,
+        "employmentPractices": 100000,
+        "total": 4350000
+      },
+      "deductibles": {
+        "property": 2500,
+        "generalLiability": 0
+      },
+      "keyFeatures": [
+        "General liability for slip and fall incidents",
+        "Property coverage for kitchen equipment",
+        "Business income for lost revenue",
+        "Employment practices liability",
+        "Food contamination coverage",
+        "Liquor liability protection"
+      ],
+      "coverageExamples": {
+        "covered": [
+          "Customer slips on wet floor and breaks arm",
+          "Kitchen fire damages equipment and inventory",
+          "Food poisoning incident affects multiple customers",
+          "Employee discrimination lawsuit",
+          "Advertising injury from competitor dispute"
+        ],
+        "notCovered": [
+          "Intentional food contamination by employee",
+          "Assault by intoxicated patron",
+          "Flood damage to restaurant",
+          "Auto accident with delivery vehicle",
+          "Workers compensation injuries"
+        ]
+      }
+    },
+    {
+      "id": "workers-comp",
+      "name": "Workers Compensation",
+      "shortName": "Workers Comp",
+      "description": "Employee injury protection",
+      "fullDescription": "Mandatory coverage protecting employees injured on the job, including medical expenses, lost wages, and rehabilitation costs.",
+      "icon": "Users",
+      "color": "bg-red-500",
+      "premium": 4200,
+      "limits": {
+        "medicalExpenses": "Unlimited",
+        "lostWages": "Statutory",
+        "rehabilitation": "Statutory",
+        "total": 0
+      },
+      "deductibles": {
+        "medicalExpenses": 0,
+        "lostWages": 0
+      },
+      "keyFeatures": [
+        "Medical expense coverage for work injuries",
+        "Lost wage replacement benefits",
+        "Rehabilitation and retraining costs",
+        "Death benefits for families",
+        "Return-to-work programs",
+        "Legal defense for disputed claims"
+      ],
+      "coverageExamples": {
+        "covered": [
+          "Cook burns hand on hot stove",
+          "Server injured lifting heavy boxes",
+          "Manager slips in walk-in cooler",
+          "Dishwasher cuts finger on broken glass",
+          "Delivery driver hurt loading supplies"
+        ],
+        "notCovered": [
+          "Injury while intoxicated or using drugs",
+          "Self-inflicted injuries",
+          "Injuries during horseplay",
+          "Pre-existing medical conditions",
+          "Injuries during commute to work"
+        ]
+      }
+    },
+    {
+      "id": "commercial-auto",
+      "name": "Commercial Auto",
+      "shortName": "Auto",
+      "description": "Vehicle liability & physical damage",
+      "fullDescription": "Protection for business vehicles including delivery cars, covering liability, collision, comprehensive, and uninsured motorist coverage.",
+      "icon": "Zap",
+      "color": "bg-green-500",
+      "premium": 1680,
+      "limits": {
+        "liability": 1000000,
+        "collision": "Actual Cash Value",
+        "comprehensive": "Actual Cash Value",
+        "uninsuredMotorist": 1000000,
+        "total": 1000000
+      },
+      "deductibles": {
+        "collision": 1000,
+        "comprehensive": 500
+      },
+      "keyFeatures": [
+        "Liability coverage for accidents",
+        "Physical damage to owned vehicles",
+        "Uninsured/underinsured motorist protection",
+        "Medical payments coverage",
+        "Hired and non-owned auto liability",
+        "Towing and labor coverage"
+      ],
+      "coverageExamples": {
+        "covered": [
+          "Delivery driver causes accident while working",
+          "Company car damaged in parking lot",
+          "Theft of delivery vehicle and contents",
+          "Vandalism to business vehicle",
+          "Hit by uninsured driver during delivery"
+        ],
+        "notCovered": [
+          "Personal use of company vehicle",
+          "Racing or speed contests",
+          "Intentional damage to vehicle",
+          "Wear and tear maintenance",
+          "Using vehicle for Uber/Lyft"
+        ]
+      }
+    }
+  ],
+  "comparisonMatrix": [
+    {
+      "coverageArea": "General Liability",
+      "policies": ["$1M / $2M", "Not Covered", "Not Covered"]
+    },
+    {
+      "coverageArea": "Property Coverage",
+      "policies": ["$750K", "Not Covered", "Not Covered"]
+    },
+    {
+      "coverageArea": "Auto Liability",
+      "policies": ["Not Covered", "Not Covered", "$1M"]
+    },
+    {
+      "coverageArea": "Workers Compensation",
+      "policies": ["Not Covered", "Statutory", "Not Covered"]
+    },
+    {
+      "coverageArea": "Employment Practices",
+      "policies": ["$100K", "Not Covered", "Not Covered"]
+    },
+    {
+      "coverageArea": "Deductible",
+      "policies": ["$2,500", "$0", "$1,000"]
+    },
+    {
+      "coverageArea": "Annual Premium",
+      "policies": ["$2,850", "$4,200", "$1,680"]
+    }
+  ]
+}
