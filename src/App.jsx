@@ -177,25 +177,24 @@ function App() {
         onClick={onClick}
         className={`group cursor-pointer transition-all duration-200 hover:shadow-lg ${
           isActive ? 'ring-2 ring-[#FF5F46] shadow-lg' : ''
-        } h-24`}                   // compact, fixed height
+        } h-20`}
       >
-        <CardHeader className="h-full p-3 flex items-center">  {/* center vertically */}
-          <div className="flex items-center gap-3 min-w-0">    {/* allow text to truncate */}
-            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+        <CardHeader className="h-full p-3 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
               isActive ? 'bg-[#FF5F46] text-white' : 'bg-gray-100 text-gray-700'
             }`}>
-              <Icon className="h-5 w-5" />
+              <Icon className="h-4 w-4" />
             </div>
-            <div className="leading-tight min-w-0">            {/* min-w-0 enables truncate */}
-              <CardTitle className="text-sm font-semibold truncate">{title}</CardTitle>
-              <CardDescription className="text-[11px] truncate">{description}</CardDescription>
+            <div className="leading-tight">
+              <CardTitle className="text-xs font-semibold truncate">{title}</CardTitle>
+              <CardDescription className="text-[10px] truncate hidden sm:block">{description}</CardDescription>
             </div>
           </div>
         </CardHeader>
       </Card>
     )
   }
-  
 
   const PolicyCard = ({ policy, onClick }) => {
     const Icon = getIconComponent(policy.icon)
@@ -277,22 +276,21 @@ function App() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation */}
-        <div className="flex flex-wrap gap-4 mb-8">
-  {navigationSections.map((section) => (
-    <div key={section.id} className="w-full sm:w-1/2 lg:w-1/6">
-      <NavigationCard
-        section={section.id}
-        icon={section.icon}
-        title={section.title}
-        description={section.description}
-        isActive={activeSection === section.id}
-        onClick={() => setActiveSection(section.id)}
-      />
-    </div>
-  ))}
-</div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-8">
+          {navigationSections.map((section) => (
+            <NavigationCard
+              key={section.id}
+              section={section.id}
+              icon={section.icon}
+              title={section.title}
+              description={section.description}
+              isActive={activeSection === section.id}
+              onClick={() => setActiveSection(section.id)}
+            />
+          ))}
+        </div>
 
         {/* Content Sections */}
         {activeSection === 'overview' && (
@@ -306,7 +304,7 @@ function App() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {data.policies.map((policy) => (
                 <PolicyCard 
                   key={policy.id} 
@@ -316,49 +314,49 @@ function App() {
               ))}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Shield className="h-5 w-5 text-[#FF5F46]" />
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center space-x-2 text-sm">
+                    <Shield className="h-4 w-4 text-[#FF5F46]" />
                     <span>Total Protection</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-[#FF5F46] mb-2">
+                  <div className="text-2xl font-bold text-[#FF5F46] mb-1">
                     ${(totalProtection / 1000000).toFixed(1)}M+
                   </div>
-                  <p className="text-sm text-gray-600">Combined coverage limits</p>
+                  <p className="text-xs text-gray-600">Combined coverage limits</p>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Calculator className="h-5 w-5 text-blue-500" />
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center space-x-2 text-sm">
+                    <Calculator className="h-4 w-4 text-blue-500" />
                     <span>Daily Investment</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-blue-500 mb-2">
+                  <div className="text-2xl font-bold text-blue-500 mb-1">
                     ${Math.round(totalPremium / 365)}
                   </div>
-                  <p className="text-sm text-gray-600">Cost per day</p>
+                  <p className="text-xs text-gray-600">Cost per day</p>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <TrendingUp className="h-5 w-5 text-green-500" />
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center space-x-2 text-sm">
+                    <TrendingUp className="h-4 w-4 text-green-500" />
                     <span>Value Ratio</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-green-500 mb-2">
+                  <div className="text-2xl font-bold text-green-500 mb-1">
                     {Math.round(totalProtection / totalPremium)}:1
                   </div>
-                  <p className="text-sm text-gray-600">Protection to premium</p>
+                  <p className="text-xs text-gray-600">Protection to premium</p>
                 </CardContent>
               </Card>
             </div>
@@ -374,7 +372,7 @@ function App() {
                 <p className="text-lg text-gray-600">{policy.fullDescription}</p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
                 <Card>
                   <CardHeader>
                     <CardTitle>Coverage Details</CardTitle>
@@ -460,7 +458,7 @@ function App() {
               <p className="text-lg text-gray-600">Compare coverage limits, deductibles, and key features across all policies</p>
             </div>
 
-            <Card>
+            <Card className="max-w-6xl mx-auto">
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -501,7 +499,7 @@ function App() {
               <p className="text-lg text-gray-600">Flexible payment options to fit your cash flow needs</p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
               <Card>
                 <CardHeader>
                   <CardTitle>Premium Breakdown</CardTitle>
@@ -576,7 +574,7 @@ function App() {
               </Card>
             </div>
 
-            <Card>
+            <Card className="max-w-4xl mx-auto">
               <CardHeader>
                 <CardTitle>Your Insurance Agent</CardTitle>
               </CardHeader>
@@ -611,7 +609,7 @@ function App() {
             </div>
 
             {!showPaymentForm && !showDeclineForm && !showConfirmation && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2 text-[#FF5F46]">

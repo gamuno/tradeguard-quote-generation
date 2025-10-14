@@ -1,4 +1,3 @@
-/* stylelint-disable at-rule-no-unknown */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -67,5 +66,229 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  }
+}
+
+/* Custom improvements for better spacing and layout */
+@layer components {
+  /* Navigation cards responsive improvements */
+  .navigation-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  @media (min-width: 768px) {
+    .navigation-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .navigation-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .navigation-grid {
+      grid-template-columns: repeat(6, 1fr);
+    }
+  }
+
+  /* Card hover effects */
+  .card-hover {
+    transition: all 0.2s ease;
+  }
+  
+  .card-hover:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-4px);
+  }
+
+  /* Constrained content widths */
+  .content-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Better table responsiveness */
+  .comparison-table {
+    min-width: 100%;
+  }
+  
+  .comparison-table th,
+  .comparison-table td {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  @media (min-width: 768px) {
+    .comparison-table th,
+    .comparison-table td {
+      padding: 1rem 1.5rem;
+      font-size: 1rem;
+    }
+  }
+
+  /* Form improvements */
+  .form-grid {
+    display: grid;
+    gap: 1rem;
+  }
+  
+  @media (min-width: 768px) {
+    .form-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Policy card improvements */
+  .policy-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 1024px) {
+    .policy-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .policy-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Stats cards */
+  .stats-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Better button spacing */
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  @media (min-width: 640px) {
+    .button-group {
+      flex-direction: row;
+    }
+  }
+  
+  .button-group > * {
+    flex: 1;
+  }
+
+  /* Improved text truncation */
+  .truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Better spacing for mobile */
+  @media (max-width: 640px) {
+    .mobile-spacing {
+      padding: 1.5rem 1rem;
+    }
+    
+    .mobile-text {
+      font-size: 0.875rem;
+    }
+    
+    .mobile-title {
+      font-size: 1.25rem;
+    }
+  }
+
+  /* Loading states */
+  .loading-shimmer {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    background-color: #e5e7eb;
+    border-radius: 0.25rem;
+  }
+
+  /* Focus improvements */
+  .focus-ring:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #FF5F46, 0 0 0 4px rgba(255, 95, 70, 0.2);
+  }
+
+  /* Brand color utilities */
+  .brand-primary {
+    color: #FF5F46;
+  }
+  
+  .brand-bg-primary {
+    background-color: #FF5F46;
+  }
+  
+  .brand-border-primary {
+    border-color: #FF5F46;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Better print styles */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    
+    .print-break {
+      page-break-before: always;
+    }
+  }
+}
+
+/* Custom animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .card {
+    border: 2px solid #1f2937;
+  }
+  
+  .button {
+    border: 2px solid currentColor;
   }
 }
