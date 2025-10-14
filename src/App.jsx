@@ -347,27 +347,31 @@ function App() {
 {/* Header */}
 <header className="bg-white shadow-sm border-b">
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="flex items-center justify-between h-16">
-      <div className="flex items-center space-x-4">
-        <img src={data.branding.logoUrl} alt={`${data.agent.company} Insurance`} className="h-8" />
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">{data.client.name}</h1>
-          <p className="text-sm text-gray-500">Insurance Portfolio Presentation</p>
+    <div className="py-4">
+      {/* Top row - Logo and Premium */}
+      <div className="flex items-center justify-between mb-3 sm:mb-0">
+        <img src={data.branding.logoUrl} alt={`${data.agent.company} Insurance`} className="h-6 sm:h-8" />
+        <div className="text-right">
+          <div className="text-lg sm:text-2xl font-bold text-[#FF5F46]">${totalPremium.toLocaleString()}</div>
+          <div className="text-xs sm:text-sm text-gray-500">Total Annual Premium</div>
         </div>
       </div>
-      <div className="flex items-center space-x-4">
-        <Badge variant="outline" className="text-[#FF5F46] border-[#FF5F46]">
+      
+      {/* Middle row - Client name and description */}
+      <div className="text-center sm:text-left mb-3 sm:mb-0">
+        <h1 className="text-lg sm:text-xl font-bold text-gray-900">{data.client.name}</h1>
+        <p className="text-sm text-gray-500">Insurance Portfolio Presentation</p>
+      </div>
+      
+      {/* Bottom row - Quote validity */}
+      <div className="text-center sm:text-right">
+        <Badge variant="outline" className="text-[#FF5F46] border-[#FF5F46] text-xs sm:text-sm">
           Quote Valid: {data.quote.validity}
         </Badge>
-        <div className="text-right">
-          <div className="text-2xl font-bold text-[#FF5F46]">${totalPremium.toLocaleString()}</div>
-          <div className="text-sm text-gray-500">Total Annual Premium</div>
-        </div>
       </div>
     </div>
   </div>
 </header>
-
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Scrollable Horizontal Navigation */}
