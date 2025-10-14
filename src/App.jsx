@@ -289,11 +289,11 @@ function App() {
   const PolicyCard = ({ policy, onClick }) => {
     const Icon = getIconComponent(policy.icon)
     return (
-      <Card className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105" onClick={onClick}>
+      <Card className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105 border-0 shadow-md" onClick={onClick}>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className={`p-3 rounded-lg ${policy.color} text-white`}>
+            <div className="p-3 rounded-lg bg-gray-100 text-gray-500">
                 <Icon className="h-6 w-6" />
               </div>
               <div>
@@ -376,27 +376,30 @@ function App() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Scrollable Horizontal Navigation */}
         <div className="relative mb-8">
-          {/* Scroll buttons */}
-          <button
-            onClick={scrollLeft}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 border border-gray-200 hover:bg-gray-50"
-          >
-            <ChevronLeft className="h-5 w-5 text-gray-600" />
-          </button>
-          
-          <button
-            onClick={scrollRight}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 border border-gray-200 hover:bg-gray-50"
-          >
-            <ChevronRight className="h-5 w-5 text-gray-600" />
-          </button>
+{/* Left scroll button */}
+<button
+  onClick={scrollLeft}
+  className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors"
+  style={{ marginLeft: '8px' }}
+>
+  <ChevronLeft className="h-4 w-4 text-gray-600" />
+</button>
+
+{/* Right scroll button */}
+<button
+  onClick={scrollRight}
+  className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors"
+  style={{ marginRight: '8px' }}
+>
+  <ChevronRight className="h-4 w-4 text-gray-600" />
+</button>
 
           {/* Scrollable container */}
           <div
-            ref={scrollContainerRef}
-            className="flex gap-4 overflow-x-auto scrollbar-hide py-2"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
+  ref={scrollContainerRef}
+  className="flex gap-4 overflow-x-auto scrollbar-hide py-2 px-12"
+  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+>
             {navigationSections.map((section) => (
               <ScrollableNavigationTab
                 key={section.id}
@@ -418,8 +421,7 @@ function App() {
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Comprehensive Protection Portfolio</h2>
               <p className="text-lg text-gray-600 max-w-3xl mx-auto">
                 Your business deserves comprehensive protection. This portfolio provides layered coverage 
-                across general liability, professional services, and cyber risks with industry-leading 
-                {data.carrier.name} insurance products.
+                across general liability, professional services, and cyber risks with industry-leading {data.carrier.name} insurance products.
               </p>
             </div>
 
@@ -434,65 +436,57 @@ function App() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center space-x-2 text-sm">
-                    <TrendingUp className="h-4 w-4 text-[#FF5F46]" />
-                    <span>Total Protection Value</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-[#FF5F46] mb-1">
-                    ${(totalProtection / 1000000).toFixed(1)}M+
-                  </div>
-                  <p className="text-xs text-gray-600">Combined liability limits across all policies</p>
-                </CardContent>
-              </Card>
+            <Card className="shadow-sm border-0 bg-white">
+  <CardContent className="p-8">
+    <div className="flex items-center space-x-4 mb-4">
+      <TrendingUp className="h-8 w-8 text-[#FF5F46]" />
+      <h3 className="text-xl font-semibold text-gray-900">Total Protection Value</h3>
+    </div>
+    <div className="text-4xl font-bold text-[#FF5F46] mb-2">
+  ${(totalProtection / 1000000).toFixed(1)}M
+</div>
+    <p className="text-lg text-gray-600">Combined liability limits across all policies</p>
+  </CardContent>
+</Card>
 
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center space-x-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Coverage Areas</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-3 w-3 text-green-500" />
-                      <span className="text-xs">General Liability</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-3 w-3 text-green-500" />
-                      <span className="text-xs">Professional E&O</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-3 w-3 text-green-500" />
-                      <span className="text-xs">Cyber & Privacy</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-3 w-3 text-green-500" />
-                      <span className="text-xs">Employment Practices</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+<Card className="shadow-sm border-0 bg-white">
+  <CardContent className="p-8">
+    <div className="flex items-center space-x-4 mb-4">
+      <CheckCircle className="h-8 w-8 text-green-500" />
+      <h3 className="text-xl font-semibold text-gray-900">Coverage Areas</h3>
+    </div>
+    <div className="space-y-3">
+      <div className="flex items-center space-x-3">
+        <CheckCircle className="h-5 w-5 text-green-500" />
+        <span className="text-lg">General Liability</span>
+      </div>
+      <div className="flex items-center space-x-3">
+        <CheckCircle className="h-5 w-5 text-green-500" />
+        <span className="text-lg">Professional E&O</span>
+      </div>
+      <div className="flex items-center space-x-3">
+        <CheckCircle className="h-5 w-5 text-green-500" />
+        <span className="text-lg">Cyber & Privacy</span>
+      </div>
+      <div className="flex items-center space-x-3">
+        <CheckCircle className="h-5 w-5 text-green-500" />
+        <span className="text-lg">Employment Practices</span>
+      </div>
+    </div>
+  </CardContent>
+</Card>
 
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center space-x-2 text-sm">
-                    <Calculator className="h-4 w-4 text-blue-500" />
-                    <span>Cost Efficiency</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-blue-500 mb-1">
-                    $0.54
-                  </div>
-                  <p className="text-xs text-gray-600">Cost per $1,000 of protection</p>
-                  <p className="text-xs text-gray-500 mt-1">Exceptional value for comprehensive coverage</p>
-                </CardContent>
-              </Card>
+<Card className="shadow-sm border-0 bg-white">
+  <CardContent className="p-8">
+    <div className="flex items-center space-x-4 mb-4">
+      <Calculator className="h-8 w-8 text-blue-500" />
+      <h3 className="text-xl font-semibold text-gray-900">Cost Efficiency</h3>
+    </div>
+    <div className="text-4xl font-bold text-blue-600 mb-2">$0.54</div>
+    <p className="text-lg text-gray-600 mb-2">Cost per $1,000 of protection</p>
+    <p className="text-base text-gray-500">Exceptional value for comprehensive coverage</p>
+  </CardContent>
+</Card>
             </div>
           </div>
         )}
@@ -517,7 +511,7 @@ function App() {
                         key !== 'total' && (
                           <div key={key} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
                             <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                            <span className={`font-semibold ${key.toLowerCase().includes('deductible') || key.toLowerCase().includes('retention') ? 'text-blue-600' : ''}`}>
+                            <span className={`font-semibold ${key.toLowerCase().includes('deductible') || key.toLowerCase().includes('retention') ? 'text-orange-600' : ''}`}>
                               {typeof value === 'number' ? `$${value.toLocaleString()}` : value}
                             </span>
                           </div>
@@ -526,7 +520,7 @@ function App() {
                       {policy.deductibles && Object.entries(policy.deductibles).map(([key, value]) => (
                         <div key={key} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
                           <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                          <span className="font-semibold text-blue-600">
+                          <span className="font-semibold text-orange-600">
                             {typeof value === 'number' ? `$${value.toLocaleString()}` : value}
                           </span>
                         </div>
@@ -782,12 +776,12 @@ function App() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-[#FF5F46] mb-1">
-                    $4M+
-                  </div>
+                <div className="text-2xl font-bold text-[#FF5F46] mb-1">
+  ${(totalProtection / 1000000).toFixed(1)}M
+</div>
                   <p className="text-xs text-gray-600">Total liability limits</p>
                   <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div className="bg-[#FF5F46] h-2 rounded-full" style={{width: '85%'}}></div>
+                    <div className="bg-[#FF5F46] h-2 rounded-full" style={{width: '100%'}}></div>
                   </div>
                 </CardContent>
               </Card>
@@ -1372,28 +1366,28 @@ function App() {
               ))}
             </div>
 
-            <Card className="bg-blue-50 border-blue-200">
+            <Card className="bg-orange-50 border-orange-200">
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-blue-800">
+                <CardTitle className="flex items-center space-x-2 text-orange-800">
                   <HeadphonesIcon className="h-6 w-6" />
                   <span>Still Have Questions?</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-blue-700 mb-4">
+                <p className="text-orange-1000 mb-4">
                   Our team is here to help! Contact us anytime for personalized assistance with your insurance needs.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex items-center space-x-2">
-                    <Phone className="h-4 w-4 text-blue-600" />
+                    <Phone className="h-4 w-4 text-orange-900" />
                     <span className="text-sm">{data.agent.phone}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Mail className="h-4 w-4 text-blue-600" />
+                    <Mail className="h-4 w-4 text-orange-900" />
                     <span className="text-sm">{data.agent.email}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-blue-600" />
+                    <Clock className="h-4 w-4 text-orange-900" />
                     <span className="text-sm">24/7 Online Support</span>
                   </div>
                 </div>
