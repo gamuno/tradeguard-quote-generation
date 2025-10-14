@@ -17,3 +17,5 @@ npm run dev
 
 npm run build
 
+npm run dev -- --host
+cd /Users/garre/Documents/dynamic-insurance-app

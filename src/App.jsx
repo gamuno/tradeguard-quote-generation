@@ -173,20 +173,22 @@ function App() {
   const NavigationCard = ({ section, icon: iconName, title, description, isActive, onClick }) => {
     const Icon = getIconComponent(iconName)
     return (
-      <Card 
-        className={`cursor-pointer transition-all duration-300 hover:shadow-lg ${
-          isActive ? 'ring-2 ring-[#FF5F46] shadow-lg' : ''
-        } py-3 gap-2`}
+      <Card
         onClick={onClick}
+        className={`group cursor-pointer transition-all duration-200 hover:shadow-lg ${
+          isActive ? 'ring-2 ring-[#FF5F46] shadow-lg' : ''
+        } h-24`}                   // compact, fixed height
       >
-        <CardHeader className="pb-2 px-4">
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${isActive ? 'bg-[#FF5F46] text-white' : 'bg-gray-100'}`}>
+        <CardHeader className="h-full p-3 flex items-center">  {/* center vertically */}
+          <div className="flex items-center gap-3 min-w-0">    {/* allow text to truncate */}
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+              isActive ? 'bg-[#FF5F46] text-white' : 'bg-gray-100 text-gray-700'
+            }`}>
               <Icon className="h-5 w-5" />
             </div>
-            <div className="leading-tight">
-              <CardTitle className="text-base">{title}</CardTitle>
-              <CardDescription className="text-xs">{description}</CardDescription>
+            <div className="leading-tight min-w-0">            {/* min-w-0 enables truncate */}
+              <CardTitle className="text-sm font-semibold truncate">{title}</CardTitle>
+              <CardDescription className="text-[11px] truncate">{description}</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -277,19 +279,20 @@ function App() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-          {navigationSections.map((section) => (
-            <NavigationCard
-              key={section.id}
-              section={section.id}
-              icon={section.icon}
-              title={section.title}
-              description={section.description}
-              isActive={activeSection === section.id}
-              onClick={() => setActiveSection(section.id)}
-            />
-          ))}
-        </div>
+        <div className="flex flex-wrap gap-4 mb-8">
+  {navigationSections.map((section) => (
+    <div key={section.id} className="w-full sm:w-1/2 lg:w-1/6">
+      <NavigationCard
+        section={section.id}
+        icon={section.icon}
+        title={section.title}
+        description={section.description}
+        isActive={activeSection === section.id}
+        onClick={() => setActiveSection(section.id)}
+      />
+    </div>
+  ))}
+</div>
 
         {/* Content Sections */}
         {activeSection === 'overview' && (
