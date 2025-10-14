@@ -119,5 +119,423 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  }
+}
+
+/* Enhanced navigation styling to match the screenshots */
+@layer components {
+  /* Sleek horizontal navigation tabs */
+  .navigation-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 0;
+  }
+  
+  .navigation-tab {
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    background-color: white;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  }
+  
+  .navigation-tab:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+  
+  .navigation-tab.active {
+    border-color: #FF5F46;
+    box-shadow: 0 4px 12px -2px rgba(255, 95, 70, 0.25);
+  }
+  
+  .navigation-tab-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .navigation-tab-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f4f6;
+    color: #6b7280;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+  
+  .navigation-tab.active .navigation-tab-icon {
+    background-color: #FF5F46;
+    color: white;
+  }
+  
+  .navigation-tab-text {
+    min-width: 0;
+    flex: 1;
+  }
+  
+  .navigation-tab-title {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.875rem;
+    line-height: 1.25;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .navigation-tab-description {
+    font-size: 0.75rem;
+    color: #6b7280;
+    line-height: 1.25;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Responsive navigation adjustments */
+  @media (max-width: 640px) {
+    .navigation-container {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .navigation-tab {
+      flex: none;
+      padding: 0.75rem;
+    }
+    
+    .navigation-tab-icon {
+      width: 2rem;
+      height: 2rem;
+    }
+    
+    .navigation-tab-title {
+      font-size: 0.8rem;
+    }
+    
+    .navigation-tab-description {
+      font-size: 0.7rem;
+    }
+  }
+  
+  @media (min-width: 641px) and (max-width: 768px) {
+    .navigation-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .navigation-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (min-width: 1025px) {
+    .navigation-tab-title {
+      font-size: 1rem;
+    }
+    
+    .navigation-tab-description {
+      font-size: 0.875rem;
+    }
+  }
+
+  /* Enhanced section content styling */
+  .section-content {
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  .section-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+  
+  .section-subtitle {
+    font-size: 1.125rem;
+    color: #6b7280;
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+  
+  .premium-highlight {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #FF5F46;
+    margin-top: 0.5rem;
+  }
+
+  /* Policy card enhancements */
+  .policy-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+  
+  .policy-card:hover {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  /* Coverage examples styling */
+  .coverage-example {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    background-color: #f9fafb;
+    margin-bottom: 1rem;
+  }
+  
+  .coverage-example-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+  }
+  
+  .coverage-example-text {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  /* Comparison table styling */
+  .comparison-table-container {
+    overflow-x: auto;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    background-color: white;
+  }
+  
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .comparison-table th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    text-align: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+  }
+  
+  .comparison-table th:first-child {
+    text-align: left;
+  }
+  
+  .comparison-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    text-align: center;
+    font-size: 0.875rem;
+  }
+  
+  .comparison-table td:first-child {
+    text-align: left;
+    font-weight: 500;
+  }
+  
+  .comparison-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .comparison-table tr:nth-child(even) {
+    background-color: #f9fafb;
+  }
+
+  /* Stats cards styling */
+  .stats-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+  
+  .stats-card {
+    background-color: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+  }
+
+  /* Form styling improvements */
+  .form-grid {
+    display: grid;
+    gap: 1rem;
+  }
+  
+  @media (min-width: 768px) {
+    .form-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Button group styling */
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  @media (min-width: 640px) {
+    .button-group {
+      flex-direction: row;
+    }
+  }
+  
+  .button-group > * {
+    flex: 1;
+  }
+
+  /* Focus improvements for accessibility */
+  .navigation-tab:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #FF5F46, 0 0 0 4px rgba(255, 95, 70, 0.2);
+  }
+  
+  .focus-ring:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #FF5F46, 0 0 0 4px rgba(255, 95, 70, 0.2);
+  }
+
+  /* Brand color utilities */
+  .brand-primary {
+    color: #FF5F46;
+  }
+  
+  .brand-bg-primary {
+    background-color: #FF5F46;
+  }
+  
+  .brand-border-primary {
+    border-color: #FF5F46;
+  }
+
+  /* Loading states */
+  .loading-shimmer {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    background-color: #e5e7eb;
+    border-radius: 0.25rem;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Print styles */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    
+    .print-break {
+      page-break-before: always;
+    }
+  }
+}
+
+/* Custom animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .navigation-tab {
+    border: 2px solid #1f2937;
+  }
+  
+  .navigation-tab.active {
+    border: 2px solid #FF5F46;
+    background-color: rgba(255, 95, 70, 0.1);
+  }
+  
+  .card {
+    border: 2px solid #1f2937;
+  }
+  
+  .button {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 480px) {
+  .navigation-tab {
+    padding: 0.5rem;
+  }
+  
+  .navigation-tab-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .premium-highlight {
+    font-size: 1.25rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 }
