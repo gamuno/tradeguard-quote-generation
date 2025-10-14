@@ -262,19 +262,24 @@ function App() {
     return (
       <div
         onClick={onClick}
+        style={{ 
+          width: 'fit-content',
+          minWidth: 'auto',
+          maxWidth: 'none'
+        }}
         className={`navigation-tab flex-shrink-0 cursor-pointer transition-all duration-200 ${
           isActive ? 'active border-[#FF5F46] border-2' : 'border-gray-200 border hover:border-gray-300'
-        } rounded-lg p-4 bg-white min-w-[200px]`}
+        } rounded-lg p-4 bg-white`}
       >
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3" style={{ whiteSpace: 'nowrap' }}>
           <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
             isActive ? 'bg-[#FF5F46] text-white' : 'bg-gray-100 text-gray-600'
           }`}>
             <Icon className="h-5 w-5" />
           </div>
-          <div className="min-w-0 flex-1">
-            <div className="font-semibold text-gray-900 text-sm whitespace-nowrap">{title}</div>
-            <div className="text-xs text-gray-500 whitespace-nowrap">{description}</div>
+          <div>
+            <div className="font-semibold text-gray-900 text-sm" style={{ whiteSpace: 'nowrap' }}>{title}</div>
+            <div className="text-xs text-gray-500" style={{ whiteSpace: 'nowrap' }}>{description}</div>
           </div>
         </div>
       </div>
@@ -339,29 +344,30 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src={data.branding.logoUrl} alt={`${data.agent.company} Insurance`} className="h-8" />
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">{data.client.name}</h1>
-                <p className="text-sm text-gray-500">Insurance Portfolio Presentation</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Badge variant="outline" className="text-[#FF5F46] border-[#FF5F46]">
-                Quote Valid: {data.quote.validity}
-              </Badge>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-[#FF5F46]">${totalPremium.toLocaleString()}</div>
-                <div className="text-sm text-gray-500">Total Annual Premium</div>
-              </div>
-            </div>
-          </div>
+{/* Header */}
+<header className="bg-white shadow-sm border-b">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-between h-16">
+      <div className="flex items-center space-x-4">
+        <img src={data.branding.logoUrl} alt={`${data.agent.company} Insurance`} className="h-8" />
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">{data.client.name}</h1>
+          <p className="text-sm text-gray-500">Insurance Portfolio Presentation</p>
         </div>
-      </header>
+      </div>
+      <div className="flex items-center space-x-4">
+        <Badge variant="outline" className="text-[#FF5F46] border-[#FF5F46]">
+          Quote Valid: {data.quote.validity}
+        </Badge>
+        <div className="text-right">
+          <div className="text-2xl font-bold text-[#FF5F46]">${totalPremium.toLocaleString()}</div>
+          <div className="text-sm text-gray-500">Total Annual Premium</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Scrollable Horizontal Navigation */}
@@ -548,26 +554,25 @@ function App() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>Real-World Examples</CardTitle>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant={showCovered ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setShowCovered(true)}
-                        className={showCovered ? "bg-[#FF5F46] hover:bg-[#FF5F46]/90" : ""}
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        What's Covered
-                      </Button>
-                      <Button
-                        variant={!showCovered ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setShowCovered(false)}
-                        className={!showCovered ? "bg-[#FF5F46] hover:bg-[#FF5F46]/90" : ""}
-                      >
-                        <EyeOff className="h-4 w-4 mr-2" />
-                        What's Not Covered
-                      </Button>
-                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 sm:space-x-0">
+  <Button
+    variant={showCovered ? "default" : "outline"}
+    onClick={() => setShowCovered(true)}
+    className={`flex-1 sm:flex-none ${showCovered ? "bg-[#FF5F46] hover:bg-[#FF5F46]/90 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+  >
+    <Eye className="h-4 w-4 mr-2" />
+    What's Covered
+  </Button>
+  <Button
+    variant={!showCovered ? "default" : "outline"}
+    onClick={() => setShowCovered(false)}
+    className={`flex-1 sm:flex-none ${!showCovered ? "bg-[#FF5F46] hover:bg-[#FF5F46]/90 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+  >
+    <EyeOff className="h-4 w-4 mr-2" />
+    What's Not Covered
+  </Button>
+</div>
+
                   </div>
                 </CardHeader>
                 <CardContent>
