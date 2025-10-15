@@ -1211,7 +1211,7 @@ if (loadError || !data) {
 
         <div className="border-t pt-4 flex justify-between font-bold text-lg">
           <span>
-            Selected Total ({selectedPaymentPlan === 'full' ? 'Full Pay' : `${selectedPaymentPlan}-Payment`}):
+            Selected Total ({selectedPaymentPlan === 'full' ? 'Full Pay' : `${selectedPaymentPlan}-Payments`}):
           </span>
           <span className="text-[#FF5F46]">{fmt(grandTotal)}</span>
         </div>
