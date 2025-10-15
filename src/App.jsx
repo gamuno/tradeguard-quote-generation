@@ -55,7 +55,7 @@ import {
 import './App.css'
 
 // Import data from JSON file
-import insuranceData from './data/insurance-data.json'
+import staticData from './data/insurance-data.json'
 
 function App() {
   const [activeSection, setActiveSection] = useState('overview')
@@ -91,7 +91,20 @@ function App() {
   // FAQ state
   const [openFAQ, setOpenFAQ] = useState(null)
 
-  const data = insuranceData
+const [data, setData] = useState(staticData);   // fallback for local preview
+const [loading, setLoading] = useState(false);
+  useEffect(() => {
+  const id = new URLSearchParams(window.location.search).get('id')
+  if (!id) return
+  setLoading(true)
+  fetch(`/api/quotes/${encodeURIComponent(id)}`)
+    .then(r => (r.ok ? r.json() : Promise.reject(new Error('Not found'))))
+    .then(json => setData(json))
+    .catch(err => console.error('Load quote failed:', err))
+    .finally(() => setLoading(false))
+}, [])
+
+  
   const brandColor = data?.branding?.primaryColor || '#FF5F46'
 
 
@@ -514,7 +527,13 @@ const considerations = data?.summaries?.considerations ?? []
     { id: 'aboutus', icon: 'Users', title: 'About TradeGuard', description: 'Why choose us' },
     { id: 'faq', icon: 'MessageSquare', title: 'FAQ', description: 'Common questions' }
   ]
-
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Loading quote…
+      </div>
+    )
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
 {/* Header */}
