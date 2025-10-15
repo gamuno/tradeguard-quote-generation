@@ -98,13 +98,13 @@ useEffect(() => {
   (async () => {
     try {
       const id = new URLSearchParams(window.location.search).get('id');
-      if (!id) {
-        throw new Error('Missing id');
-      }
-      const res = await fetch(`/api/quotes/${encodeURIComponent(id)}`, {
+      if (!id) throw new Error('Missing id');
+
+      const res = await fetch(`/quotes/${encodeURIComponent(id)}.json`, {
         headers: { Accept: 'application/json' },
       });
       if (!res.ok) throw new Error('NOT_FOUND');
+
       const json = await res.json();
       setData(json);
       setLoadError(null);
@@ -116,6 +116,7 @@ useEffect(() => {
     }
   })();
 }, []);
+
 
   
 const brandColor = data?.branding?.primaryColor || '#FF5F46'
