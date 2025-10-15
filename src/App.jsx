@@ -54,9 +54,6 @@ import {
 } from 'lucide-react'
 import './App.css'
 
-// Import data from JSON file
-import staticData from './data/insurance-data.json'
-
 function App() {
   const [activeSection, setActiveSection] = useState('overview')
   const [showCovered, setShowCovered] = useState(true)
@@ -91,25 +88,41 @@ function App() {
   // FAQ state
   const [openFAQ, setOpenFAQ] = useState(null)
 
-const [data, setData] = useState(staticData);   // fallback for local preview
-const [loading, setLoading] = useState(false);
-  useEffect(() => {
-  const id = new URLSearchParams(window.location.search).get('id')
-  if (!id) return
-  setLoading(true)
-  fetch(`/api/quotes/${encodeURIComponent(id)}`)
-    .then(r => (r.ok ? r.json() : Promise.reject(new Error('Not found'))))
-    .then(json => setData(json))
-    .catch(err => console.error('Load quote failed:', err))
-    .finally(() => setLoading(false))
-}, [])
+  
+// quote specific data 
+const [data, setData] = useState(null);
+const [loading, setLoading] = useState(true);
+const [loadError, setLoadError] = useState(null);
+
+useEffect(() => {
+  (async () => {
+    try {
+      const id = new URLSearchParams(window.location.search).get('id');
+      if (!id) {
+        throw new Error('Missing id');
+      }
+      const res = await fetch(`/api/quotes/${encodeURIComponent(id)}`, {
+        headers: { Accept: 'application/json' },
+      });
+      if (!res.ok) throw new Error('NOT_FOUND');
+      const json = await res.json();
+      setData(json);
+      setLoadError(null);
+    } catch (e) {
+      setData(null);
+      setLoadError(e.message === 'NOT_FOUND' ? 'Quote not found' : 'Missing id');
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, []);
 
   
-  const brandColor = data?.branding?.primaryColor || '#FF5F46'
+const brandColor = data?.branding?.primaryColor || '#FF5F46'
 
-
-  const totalPremium = data.policies.reduce((sum, policy) => sum + policy.premium, 0)
-  const totalProtection = data.policies.reduce((sum, policy) => sum + policy.limits.total, 0)
+// SAFE when data is still null
+const totalPremium = (data?.policies ?? []).reduce((sum, policy) => sum + (Number(policy.premium) || 0), 0)
+const totalProtection = (data?.policies ?? []).reduce((sum, policy) => sum + (Number(policy?.limits?.total) || 0), 0)
   // existing
 const fmt = (n) =>
   n?.toLocaleString?.('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) ?? '$0'
@@ -249,7 +262,7 @@ const roiRatio = totalPremium > 0 ? `${Math.round(totalProtection / totalPremium
 
 // === Coverage Areas from comparisonMatrix ===
 // Include any row where at least one policy isn't "Not Covered"/"Excluded"
-const coverageAreas = Array.isArray(data.comparisonMatrix)
+const coverageAreas = Array.isArray(data?.comparisonMatrix)
   ? data.comparisonMatrix
       .filter(row =>
         Array.isArray(row.policies) &&
@@ -514,26 +527,25 @@ const considerations = data?.summaries?.considerations ?? []
 
   // Generate navigation sections dynamically
   const navigationSections = [
-    { id: 'overview', icon: 'Shield', title: 'Overview', description: 'Portfolio summary' },
-    ...data.policies.map(policy => ({
-      id: policy.id,
-      icon: policy.icon,
-      title: policy.name,
-      description: policy.description
-    })),
-    { id: 'comparison', icon: 'FileText', title: 'Policy Comparison', description: 'Side by side analysis' },
-    { id: 'investment', icon: 'DollarSign', title: 'Investment Summary', description: 'Cost & payment options' },
-    { id: 'nextsteps', icon: 'ArrowRight', title: 'Next Steps', description: 'Client decision' },
-    { id: 'aboutus', icon: 'Users', title: 'About TradeGuard', description: 'Why choose us' },
-    { id: 'faq', icon: 'MessageSquare', title: 'FAQ', description: 'Common questions' }
-  ]
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Loading quote…
-      </div>
-    )
-  }
+  { id: 'overview', icon: 'Shield', title: 'Overview', description: 'Portfolio summary' },
+  ...(data?.policies ?? []).map(policy => ({
+    id: policy.id,
+    icon: policy.icon,
+    title: policy.name,
+    description: policy.description
+  })),
+  { id: 'comparison', icon: 'FileText', title: 'Policy Comparison', description: 'Side by side analysis' },
+  { id: 'investment', icon: 'DollarSign', title: 'Investment Summary', description: 'Cost & payment options' },
+  { id: 'nextsteps', icon: 'ArrowRight', title: 'Next Steps', description: 'Client decision' },
+  { id: 'aboutus', icon: 'Users', title: 'About TradeGuard', description: 'Why choose us' },
+  { id: 'faq', icon: 'MessageSquare', title: 'FAQ', description: 'Common questions' }
+]
+if (loading) {
+  return <div className="min-h-screen grid place-items-center">Loading…</div>;
+}
+if (loadError || !data) {
+  return <div className="min-h-screen grid place-items-center">{loadError || 'Error'}</div>;
+}
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
 {/* Header */}
