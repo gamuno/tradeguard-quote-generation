@@ -56,6 +56,18 @@
       "icon": "Building",
       "color": "bg-blue-500",
       "premium": 513,
+      "paymentOptions": {
+  "totalPremium": 513,
+  "fullPay": {
+    "amount": 513,
+    "discountAmount": 0
+  },
+  "installments": {
+    "counts": [2, 4, 10],        
+    "perInstallmentFee": 10,     
+    "downPaymentPercent": 0     
+}
+      },
       "limits": {
         "generalLiability": 1000000,
         "aggregate": 2000000,
@@ -104,6 +116,18 @@
       "icon": "Umbrella",
       "color": "bg-green-500",
       "premium": 735,
+      "paymentOptions": {
+  "totalPremium": 735,
+  "fullPay": {
+    "amount": 735,
+    "discountAmount": 0
+  },
+  "installments": {
+    "counts": [2, 4, 10],        
+    "perInstallmentFee": 10,     
+    "downPaymentPercent": 0     
+}
+      },
       "limits": {
         "excessLiability": 1000000,
         "total": 1000000
@@ -143,6 +167,18 @@
       "icon": "Laptop",
       "color": "bg-purple-500",
       "premium": 915,
+      "paymentOptions": {
+  "totalPremium": 915,
+  "fullPay": {
+    "amount": 915,
+    "discountAmount": 0
+  },
+  "installments": {
+    "counts": [2, 4, 10],        
+    "perInstallmentFee": 10,     
+    "downPaymentPercent": 0     
+}
+      },
       "limits": {
         "professionalLiability": 1000000,
         "aggregate": 1000000,

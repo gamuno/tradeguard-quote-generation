@@ -73,6 +73,7 @@ function App() {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [submissionType, setSubmissionType] = useState('')
 
+
   // Credit card form states
   const [cardNumber, setCardNumber] = useState('')
   const [expiryDate, setExpiryDate] = useState('')
@@ -85,13 +86,149 @@ function App() {
   const [accountHolderName, setAccountHolderName] = useState('')
   const [accountType, setAccountType] = useState('')
 
+
+
   // FAQ state
   const [openFAQ, setOpenFAQ] = useState(null)
 
   const data = insuranceData
+  const brandColor = data?.branding?.primaryColor || '#FF5F46'
+
 
   const totalPremium = data.policies.reduce((sum, policy) => sum + policy.premium, 0)
   const totalProtection = data.policies.reduce((sum, policy) => sum + policy.limits.total, 0)
+  // existing
+const fmt = (n) =>
+  n?.toLocaleString?.('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) ?? '$0'
+
+const resolveFeeForCount = (installments, count) => {
+  const base = Number(installments?.perInstallmentFee || 0)
+  const ov = (installments?.overrides || []).find(o => Number(o.count) === Number(count))
+  return Number(ov?.perInstallmentFee ?? base)
+}
+
+// optional: can keep or remove; not used by single-tabset
+const computeInstallmentBreakdown = (policy) => {
+  const po = policy.paymentOptions
+  const inst = po?.installments
+  if (!po || !inst || !Array.isArray(inst.counts) || inst.counts.length === 0) return []
+  const base = Number(po.totalPremium ?? policy.premium ?? 0)
+  const downPct = Number(inst.downPaymentPercent || 0)
+  const downPayment = downPct > 0 ? (base * (downPct / 100)) : 0
+  const financed = Math.max(base - downPayment, 0)
+  return inst.counts.map((countRaw) => {
+    const count = Number(countRaw || 0)
+    if (count <= 0) return null
+    const fee = resolveFeeForCount(inst, count)
+    const perPayment = financed / count
+    const perPaymentWithFee = perPayment + fee
+    const totalFees = fee * count
+    const totalPaid = downPayment + (perPaymentWithFee * count)
+    return {
+      count, perInstallmentFee: fee, downPaymentPercent: downPct, downPayment,
+      perPayment, perPaymentWithFee, totalFees, totalPaid
+    }
+  }).filter(Boolean)
+}
+
+// NEW: add these two for the single-tabset
+const getAllCounts = (policies) => {
+  const set = new Set()
+  for (const p of policies) {
+    const counts = p?.paymentOptions?.installments?.counts
+    if (Array.isArray(counts)) counts.forEach(c => Number.isFinite(+c) && set.add(+c))
+  }
+  return Array.from(set).sort((a, b) => a - b)
+}
+
+const computePlanForCount = (policy, count) => {
+  const po = policy?.paymentOptions
+  const inst = po?.installments
+  if (!po || !inst) return null
+  const base = Number(po.totalPremium ?? policy.premium ?? 0)
+  const downPct = Number(inst.downPaymentPercent || 0)
+  const downPayment = downPct > 0 ? (base * (downPct / 100)) : 0
+  const financed = Math.max(base - downPayment, 0)
+  const fee = resolveFeeForCount(inst, count)
+  const perPayment = financed / Number(count)
+  const perPaymentWithFee = perPayment + fee
+  const totalFees = fee * Number(count)
+  const totalPaid = downPayment + (perPaymentWithFee * Number(count))
+  return {
+    count,
+    perInstallmentFee: fee,
+    downPaymentPercent: downPct,
+    downPayment,
+    perPayment,
+    perPaymentWithFee,
+    totalFees,
+    totalPaid
+  }
+}
+
+// Allowed counts = intersection across selected policies
+const getCountsForPolicy = (policy) =>
+  Array.isArray(policy?.paymentOptions?.installments?.counts)
+    ? policy.paymentOptions.installments.counts.map(Number).filter(n => Number.isFinite(n))
+    : []
+
+const getAllowedCountsForSelection = (policies, selectedIds) => {
+  const selected = policies.filter(p => selectedIds.includes(p.id))
+  if (selected.length === 0) return []
+  let set = new Set(getCountsForPolicy(selected[0]))
+  for (const p of selected.slice(1)) {
+    const next = new Set(getCountsForPolicy(p))
+    set = new Set([...set].filter(x => next.has(x)))
+  }
+  return [...set].sort((a,b)=>a-b)
+}
+
+// Amount calculators
+const computePolicyFullAmount = (policy) =>
+  Number(policy.paymentOptions?.fullPay?.amount ?? policy.premium ?? policy.paymentOptions?.totalPremium ?? 0)
+
+const computePolicyTotalForCount = (policy, count) => {
+  const plan = computePlanForCount(policy, count)
+  return Number(plan?.totalPaid ?? 0)
+}
+
+// Build a selection summary for the chosen plan
+// plan can be "full" or a number (count)
+const computeSelectionTotals = (plan, policies, selectedIds) => {
+  const selected = policies.filter(p => selectedIds.includes(p.id))
+  const perPolicy = selected.map(p => {
+    if (plan === 'full') {
+      const amount = computePolicyFullAmount(p)
+      return {
+        policyId: p.id,
+        policyName: p.name,
+        type: 'full',
+        amount,
+      }
+    }
+    // installment
+    const planObj = computePlanForCount(p, Number(plan))
+    return {
+      policyId: p.id,
+      policyName: p.name,
+      type: 'installments',
+      count: Number(plan),
+      perInstallmentFee: Number(planObj?.perInstallmentFee ?? 0),
+      downPaymentPercent: Number(planObj?.downPaymentPercent ?? 0),
+      downPayment: Number(planObj?.downPayment ?? 0),
+      perPayment: Number(planObj?.perPayment ?? 0),
+      perPaymentWithFee: Number(planObj?.perPaymentWithFee ?? 0),
+      totalFees: Number(planObj?.totalFees ?? 0),
+      totalPaid: Number(planObj?.totalPaid ?? 0),
+    }
+  })
+
+  const grandTotal = perPolicy.reduce((s, row) => s + (row.type === 'full' ? row.amount : row.totalPaid || 0), 0)
+  return { perPolicy, grandTotal }
+}
+
+
+
   // === Derived metrics ===
 const costPerThousand = totalProtection > 0 ? (totalPremium / (totalProtection / 1000)) : 0
 const costPerDay = totalPremium > 0 ? (totalPremium / 365) : 0
@@ -115,21 +252,6 @@ const coverageAreas = Array.isArray(data.comparisonMatrix)
 const coverageStrengths = data?.summaries?.coverageStrengths ?? []
 const considerations = data?.summaries?.considerations ?? []
 
-
-  const paymentPlans = {
-    full: { name: 'Full Pay', percentage: 100, payments: 1, fee: 0 },
-    two: { name: '2-Pay', percentage: 60, payments: 2, fee: 10 },
-    four: { name: '4-Pay', percentage: 40, payments: 4, fee: 10 },
-    ten: { name: '10-Pay', percentage: 25.3, payments: 10, fee: 10 }
-  }
-
-  const calculatePayment = (plan) => {
-    const planData = paymentPlans[plan]
-    const firstPayment = (totalPremium * planData.percentage) / 100
-    const totalFees = (planData.payments - 1) * planData.fee
-    const totalCost = totalPremium + totalFees
-    return { firstPayment, totalCost, totalFees }
-  }
 
   const getIconComponent = (iconName) => {
     const icons = {
@@ -174,31 +296,59 @@ const considerations = data?.summaries?.considerations ?? []
   }
 
   const handleAcceptSubmission = async () => {
+    // Build plan-aware totals & per-policy breakdown
+    const { perPolicy, grandTotal } = computeSelectionTotals(
+      selectedPaymentPlan,   // 'full' or a number (count)
+      data.policies,
+      selectedPolicies
+    )
+  
     const payload = {
       client_name: data.client.name,
       decision: 'accept',
       selected_policies: selectedPolicies,
+  
+      // NEW: chosen plan summarized for downstream logic
+      payment_plan: selectedPaymentPlan === 'full'
+        ? { type: 'full', count: 1 }
+        : { type: 'installments', count: Number(selectedPaymentPlan) },
+  
+      // NEW: per-policy details (amounts, fees, down payment, etc. when installments)
+      payment_breakdown: perPolicy,
+  
+      // NEW: grand total for the chosen plan (sum across selected policies)
+      total_due: grandTotal,
+  
+      // Existing: payment method + limited details
       payment_method: paymentMethod,
-      payment_details: paymentMethod === 'credit_card' ? {
-        card_number: cardNumber.slice(-4), // Only last 4 digits for security
-        cardholder_name: cardholderName
-      } : {
-        account_holder_name: accountHolderName,
-        account_type: accountType
-      },
-      total_premium: calculateSelectedPremium(),
+      payment_details:
+        paymentMethod === 'credit_card'
+          ? {
+              card_number_last4: cardNumber.replace(/\s+/g, '').slice(-4),
+              cardholder_name: cardholderName,
+              expiry: expiryDate
+            }
+          : {
+              account_holder_name: accountHolderName,
+              routing_last4: routingNumber.replace(/\s+/g, '').slice(-4),
+              account_type: accountType
+            },
+  
       agent_email: data.agent.email,
       submission_date: new Date().toISOString().split('T')[0],
       presentation_url: window.location.href
     }
-
+  
     const success = await submitWebhook(payload)
     if (success) {
       setSubmissionType('accept')
       setShowConfirmation(true)
       setShowPaymentForm(false)
+    } else {
+      console.error('Webhook submission failed')
     }
   }
+  
 
   const handleDeclineSubmission = async () => {
     const payload = {
@@ -263,7 +413,7 @@ const considerations = data?.summaries?.considerations ?? []
     },
     {
       question: "How quickly can I get a certificate of insurance?",
-      answer: "Certificates are available instantly through our client portal 24/7. You can also request custom certificates for specific projects or requirements, which are typically processed within 2 hours during business hours."
+      answer: "Basic certificates are available instantly through our client portal 24/7. We also use AI to process custom COIs and contract reviews in minutes, ensuring you are always in compliance with insurance requirements."
     },
     {
       question: "What happens if my business grows or changes?",
@@ -725,53 +875,156 @@ const considerations = data?.summaries?.considerations ?? []
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Payment Options</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Tabs value={selectedPaymentPlan} onValueChange={setSelectedPaymentPlan}>
-                    <TabsList className="grid w-full grid-cols-4">
-                      <TabsTrigger value="full">Full</TabsTrigger>
-                      <TabsTrigger value="two">2-Pay</TabsTrigger>
-                      <TabsTrigger value="four">4-Pay</TabsTrigger>
-                      <TabsTrigger value="ten">10-Pay</TabsTrigger>
-                    </TabsList>
-                    {Object.entries(paymentPlans).map(([key, plan]) => (
-                      <TabsContent key={key} value={key} className="mt-4">
-                        <div className="space-y-3">
-                          <div className="flex justify-between">
-                            <span>First Payment</span>
-                            <span className="font-semibold">
-                              ${Math.round(calculatePayment(key).firstPayment)}
-                            </span>
+{/* PAYMENT OPTIONS — Single Tabset Aggregating All Policies (keeps prior styling) */}
+<Card className="mb-6">
+  <CardHeader>
+    <CardTitle>Payment Options</CardTitle>
+    <CardDescription>
+      Choose a plan to view per-policy breakdown
+    </CardDescription>
+  </CardHeader>
+
+  <CardContent>
+    {(() => {
+      const allCounts = getAllCounts(data.policies)   // e.g., [2,4,10]
+      const defaultTab = "full"
+      const brandColor = data?.branding?.primaryColor || "#FF5F46"
+
+      return (
+        <Tabs defaultValue={defaultTab} className="w-full">
+          {/* Triggers — same look as before */}
+          <TabsList className="w-full inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground overflow-x-auto">
+            <TabsTrigger className="flex-1 whitespace-nowrap" value="full">Full Pay</TabsTrigger>
+            {allCounts.map((c) => (
+              <TabsTrigger
+                key={`trig-${c}`}
+                value={`count-${c}`}
+                className="flex-1 whitespace-nowrap"
+              >
+                {c}-Pay
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {/* FULL PAY TAB */}
+          <TabsContent value="full" className="mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {data.policies.map((policy) => {
+                const po = policy.paymentOptions
+                if (!po) return null
+                const amount = Number(po.fullPay?.amount ?? policy.premium ?? po.totalPremium ?? 0)
+                const discount = Number(po.fullPay?.discountAmount ?? 0)
+                return (
+                  <div key={`full-${policy.id}`} className="rounded-xl border border-gray-200 p-5 flex items-center justify-between">
+                    <div>
+                      <div className="text-sm text-gray-500">{policy.name}</div>
+                      <div className="text-2xl font-bold">{fmt(amount)}</div>
+                      {discount > 0 && (
+                        <div className="text-xs text-green-600 mt-1">
+                          Saves {fmt(discount)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-right text-sm text-gray-600">
+                      No installment fees
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Full Pay total footer */}
+            {(() => {
+              const fullTotal = data.policies.reduce((sum, policy) => {
+                const po = policy.paymentOptions
+                if (!po) return sum
+                const amount = Number(po.fullPay?.amount ?? policy.premium ?? po.totalPremium ?? 0)
+                return sum + (Number.isFinite(amount) ? amount : 0)
+              }, 0)
+              return (
+                <div className="mt-4 flex justify-end">
+                  <div className="text-xl font-bold" style={{ color: brandColor }}>
+                    Total Due (Full Pay): {fmt(fullTotal)}
+                  </div>
+                </div>
+              )
+            })()}
+          </TabsContent>
+
+          {/* COUNT TABS (2-Pay, 4-Pay, 10-Pay, etc.) */}
+          {allCounts.map((c) => (
+            <TabsContent key={`pane-${c}`} value={`count-${c}`} className="mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {data.policies.map((policy) => {
+                  const po = policy.paymentOptions
+                  const counts = po?.installments?.counts
+                  if (!po || !Array.isArray(counts) || !counts.includes(c)) return null
+
+                  const plan = computePlanForCount(policy, c)
+                  if (!plan) return null
+
+                  return (
+                    <div key={`p-${policy.id}-${c}`} className="rounded-xl border border-gray-200 p-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="space-y-1.5">
+                          <div className="text-sm text-gray-500">{policy.name}</div>
+                          <div className="text-lg font-semibold">{plan.count} Payments</div>
+
+                          <div className="text-xs text-gray-600">
+                            {plan.downPaymentPercent > 0
+                              ? <>Down Payment: <span className="font-medium">{plan.downPaymentPercent}%</span> ({fmt(plan.downPayment)})</>
+                              : <>No stated down payment</>}
                           </div>
-                          {plan.payments > 1 && (
-                            <>
-                              <div className="flex justify-between">
-                                <span>Remaining Payments</span>
-                                <span>{plan.payments - 1} × $10 fee</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span>Total Fees</span>
-                                <span>${calculatePayment(key).totalFees}</span>
-                              </div>
-                            </>
-                          )}
-                          <div className="border-t pt-3">
-                            <div className="flex justify-between font-bold">
-                              <span>Total Cost</span>
-                              <span className="text-[#FF5F46]">
-                                ${calculatePayment(key).totalCost}
-                              </span>
-                            </div>
+
+                          <div className="text-xs text-gray-600">
+                            Fee per payment: <span className="font-medium">{fmt(plan.perInstallmentFee)}</span>
+                          </div>
+
+                          <div className="text-xs text-gray-600">
+                            Total fees: <span className="font-medium">{fmt(plan.totalFees)}</span>
                           </div>
                         </div>
-                      </TabsContent>
-                    ))}
-                  </Tabs>
-                </CardContent>
-              </Card>
+
+                        <div className="text-right">
+                          <div className="text-sm text-gray-500">Each Payment</div>
+                          <div className="text-2xl font-bold leading-tight">{fmt(plan.perPaymentWithFee)}</div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            Total Paid: <span className="font-medium">{fmt(plan.totalPaid)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* N-Pay total footer */}
+              {(() => {
+                const totalForCount = data.policies.reduce((sum, policy) => {
+                  const counts = policy?.paymentOptions?.installments?.counts
+                  if (!Array.isArray(counts) || !counts.includes(c)) return sum
+                  const plan = computePlanForCount(policy, c)
+                  const paid = Number(plan?.totalPaid ?? 0)
+                  return sum + (Number.isFinite(paid) ? paid : 0)
+                }, 0)
+                return (
+                  <div className="mt-4 flex justify-end">
+                    <div className="text-xl font-bold" style={{ color: brandColor }}>
+                      Total Paid ({c}-Pay): {fmt(totalForCount)}
+                    </div>
+                  </div>
+                )
+              })()}
+            </TabsContent>
+          ))}
+        </Tabs>
+      )
+    })()}
+  </CardContent>
+</Card>
+
+
+
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -870,44 +1123,79 @@ const considerations = data?.summaries?.considerations ?? []
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <p className="text-gray-600">Select the policies you'd like to secure and proceed with payment.</p>
-                    
-                    <div className="space-y-3">
-                      <h4 className="font-semibold">Select Coverage:</h4>
-                      {data.policies.map((policy) => (
-                        <div key={policy.id} className="flex items-center space-x-3 p-3 border rounded-lg">
-                          <Checkbox
-                            id={policy.id}
-                            checked={selectedPolicies.includes(policy.id)}
-                            onCheckedChange={(checked) => handlePolicySelection(policy.id, checked)}
-                          />
-                          <Label htmlFor={policy.id} className="flex-1 cursor-pointer">
-                            <div className="flex justify-between">
-                              <span>{policy.name}</span>
-                              <span className="font-semibold text-[#FF5F46]">${policy.premium}</span>
-                            </div>
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
+  <p className="text-gray-600">Select the policies you'd like to secure and proceed with payment.</p>
+  
+  {/* Select Coverage checklist (unchanged) */}
+  <div className="space-y-3">
+    <h4 className="font-semibold">Select Coverage:</h4>
+    {data.policies.map((policy) => (
+      <div key={policy.id} className="flex items-center space-x-3 p-3 border rounded-lg">
+        <Checkbox
+          id={policy.id}
+          checked={selectedPolicies.includes(policy.id)}
+          onCheckedChange={(checked) => handlePolicySelection(policy.id, checked)}
+        />
+        <Label htmlFor={policy.id} className="flex-1 cursor-pointer">
+          <div className="flex justify-between">
+            <span>{policy.name}</span>
+            <span className="font-semibold text-[#FF5F46]">${policy.premium}</span>
+          </div>
+        </Label>
+      </div>
+    ))}
+  </div>
 
-                    {selectedPolicies.length > 0 && (
-                      <div className="border-t pt-4">
-                        <div className="flex justify-between font-bold text-lg">
-                          <span>Selected Total:</span>
-                          <span className="text-[#FF5F46]">${calculateSelectedPremium()}</span>
-                        </div>
-                      </div>
-                    )}
+  {/* INSERTED: Plan selector + plan-aware total */}
+  {selectedPolicies.length > 0 && (() => {
+    // intersection of counts across selected policies
+    const allowedCounts = getAllowedCountsForSelection(data.policies, selectedPolicies)
+    const { grandTotal } = computeSelectionTotals(
+      selectedPaymentPlan,        // 'full' or number
+      data.policies,
+      selectedPolicies
+    )
 
-                    <Button 
-                      className="w-full bg-[#FF5F46] hover:bg-[#FF5F46]/90"
-                      disabled={selectedPolicies.length === 0}
-                      onClick={() => setShowPaymentForm(true)}
-                    >
-                      Proceed to Payment
-                    </Button>
-                  </CardContent>
+    return (
+      <>
+        <div className="space-y-3 mt-4">
+          <h4 className="font-semibold">Choose Payment Plan:</h4>
+          <RadioGroup
+            value={String(selectedPaymentPlan)}
+            onValueChange={(v) => setSelectedPaymentPlan(v === 'full' ? 'full' : Number(v))}
+            className="grid grid-cols-1 sm:grid-cols-4 gap-2"
+          >
+            <div className="flex items-center space-x-2 border rounded-lg p-2">
+              <RadioGroupItem value="full" id="plan-full" />
+              <Label htmlFor="plan-full">Full Pay</Label>
+            </div>
+            {allowedCounts.map((c) => (
+              <div key={c} className="flex items-center space-x-2 border rounded-lg p-2">
+                <RadioGroupItem value={String(c)} id={`plan-${c}`} />
+                <Label htmlFor={`plan-${c}`}>{c}-Pay</Label>
+              </div>
+            ))}
+          </RadioGroup>
+        </div>
+
+        <div className="border-t pt-4 flex justify-between font-bold text-lg">
+          <span>
+            Selected Total ({selectedPaymentPlan === 'full' ? 'Full Pay' : `${selectedPaymentPlan}-Pay`}):
+          </span>
+          <span className="text-[#FF5F46]">{fmt(grandTotal)}</span>
+        </div>
+      </>
+    )
+  })()}
+
+  <Button 
+    className="w-full bg-[#FF5F46] hover:bg-[#FF5F46]/90"
+    disabled={selectedPolicies.length === 0}
+    onClick={() => setShowPaymentForm(true)}
+  >
+    Proceed to Payment
+  </Button>
+</CardContent>
+
                 </Card>
 
                 <Card>
@@ -966,21 +1254,43 @@ const considerations = data?.summaries?.considerations ?? []
                   <CardDescription>Choose your payment method to secure your coverage</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-semibold mb-2">Selected Coverage:</h4>
-                    {data.policies.filter(p => selectedPolicies.includes(p.id)).map(policy => (
-                      <div key={policy.id} className="flex justify-between">
-                        <span>{policy.name}</span>
-                        <span>${policy.premium}</span>
-                      </div>
-                    ))}
-                    <div className="border-t mt-2 pt-2 font-bold">
-                      <div className="flex justify-between">
-                        <span>Total:</span>
-                        <span className="text-[#FF5F46]">${calculateSelectedPremium()}</span>
-                      </div>
-                    </div>
-                  </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+  <h4 className="font-semibold mb-2">Selected Coverage:</h4>
+
+  {(() => {
+    const { perPolicy, grandTotal } = computeSelectionTotals(
+      selectedPaymentPlan,   // 'full' or a number (count)
+      data.policies,
+      selectedPolicies
+    )
+
+    return (
+      <>
+        {/* per-policy rows reflect the chosen plan */}
+        {perPolicy.map(row => (
+          <div key={row.policyId} className="flex justify-between text-sm">
+            <span>{row.policyName}</span>
+            {row.type === 'full' ? (
+              <span>{fmt(row.amount)}</span>
+            ) : (
+              <span>{row.count}-Pay · Total {fmt(row.totalPaid)}</span>
+            )}
+          </div>
+        ))}
+
+        <div className="border-t mt-2 pt-2 font-bold">
+          <div className="flex justify-between">
+            <span>
+              Total ({selectedPaymentPlan === 'full' ? 'Full Pay' : `${selectedPaymentPlan}-Pay`}):
+            </span>
+            <span className="text-[#FF5F46]">{fmt(grandTotal)}</span>
+          </div>
+        </div>
+      </>
+    )
+  })()}
+</div>
+
 
                   <div className="space-y-4">
                     <Label>Payment Method:</Label>
