@@ -92,6 +92,29 @@ function App() {
 
   const totalPremium = data.policies.reduce((sum, policy) => sum + policy.premium, 0)
   const totalProtection = data.policies.reduce((sum, policy) => sum + policy.limits.total, 0)
+  // === Derived metrics ===
+const costPerThousand = totalProtection > 0 ? (totalPremium / (totalProtection / 1000)) : 0
+const costPerDay = totalPremium > 0 ? (totalPremium / 365) : 0
+const roiRatio = totalPremium > 0 ? `${Math.round(totalProtection / totalPremium).toLocaleString()}:1` : '—'
+
+// === Coverage Areas from comparisonMatrix ===
+// Include any row where at least one policy isn't "Not Covered"/"Excluded"
+const coverageAreas = Array.isArray(data.comparisonMatrix)
+  ? data.comparisonMatrix
+      .filter(row =>
+        Array.isArray(row.policies) &&
+        row.policies.some(p => {
+          const v = String(p || '').toLowerCase()
+          return v !== 'not covered' && v !== 'excluded' && v !== ''
+        })
+      )
+      .map(row => row.coverageArea)
+  : []
+
+// Optional summaries (fallback to empty arrays if not present)
+const coverageStrengths = data?.summaries?.coverageStrengths ?? []
+const considerations = data?.summaries?.considerations ?? []
+
 
   const paymentPlans = {
     full: { name: 'Full Pay', percentage: 100, payments: 1, fee: 0 },
@@ -456,23 +479,17 @@ function App() {
       <h3 className="text-xl font-semibold text-gray-900">Coverage Areas</h3>
     </div>
     <div className="space-y-3">
-      <div className="flex items-center space-x-3">
+  {coverageAreas.length === 0 ? (
+    <div className="text-sm text-gray-500">No coverage areas found.</div>
+  ) : (
+    coverageAreas.map((area, idx) => (
+      <div key={idx} className="flex items-center space-x-3">
         <CheckCircle className="h-5 w-5 text-green-500" />
-        <span className="text-lg">General Liability</span>
+        <span className="text-lg">{area}</span>
       </div>
-      <div className="flex items-center space-x-3">
-        <CheckCircle className="h-5 w-5 text-green-500" />
-        <span className="text-lg">Professional E&O</span>
-      </div>
-      <div className="flex items-center space-x-3">
-        <CheckCircle className="h-5 w-5 text-green-500" />
-        <span className="text-lg">Cyber & Privacy</span>
-      </div>
-      <div className="flex items-center space-x-3">
-        <CheckCircle className="h-5 w-5 text-green-500" />
-        <span className="text-lg">Employment Practices</span>
-      </div>
-    </div>
+    ))
+  )}
+</div>
   </CardContent>
 </Card>
 
@@ -482,7 +499,9 @@ function App() {
       <Calculator className="h-8 w-8 text-blue-500" />
       <h3 className="text-xl font-semibold text-gray-900">Cost Efficiency</h3>
     </div>
-    <div className="text-4xl font-bold text-blue-600 mb-2">$0.54</div>
+    <div className="text-4xl font-bold text-blue-600 mb-2">
+  ${costPerThousand.toFixed(2)}
+</div>
     <p className="text-lg text-gray-600 mb-2">Cost per $1,000 of protection</p>
     <p className="text-base text-gray-500">Exceptional value for comprehensive coverage</p>
   </CardContent>
@@ -632,24 +651,18 @@ function App() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">Comprehensive general liability protection</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">Professional E&O for consulting services</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">Cyber incident response and coverage</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">Employment practices liability included</span>
-                    </div>
-                  </div>
+                <div className="space-y-3">
+  {coverageStrengths.length === 0 ? (
+    <div className="text-sm text-gray-500">No strengths available.</div>
+  ) : (
+    coverageStrengths.map((item, idx) => (
+      <div key={idx} className="flex items-center space-x-2">
+        <CheckCircle className="h-4 w-4 text-green-500" />
+        <span className="text-sm">{item}</span>
+      </div>
+    ))
+  )}
+</div>
                 </CardContent>
               </Card>
 
@@ -661,24 +674,18 @@ function App() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-start space-x-2">
-                      <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
-                      <span className="text-sm">Deductibles vary by coverage type</span>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
-                      <span className="text-sm">Some exclusions apply to each policy</span>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
-                      <span className="text-sm">Coverage territory may be limited</span>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
-                      <span className="text-sm">Claims reporting requirements apply</span>
-                    </div>
-                  </div>
+                <div className="space-y-3">
+  {considerations.length === 0 ? (
+    <div className="text-sm text-gray-500">No considerations available.</div>
+  ) : (
+    considerations.map((item, idx) => (
+      <div key={idx} className="flex items-start space-x-2">
+        <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
+        <span className="text-sm">{item}</span>
+      </div>
+    ))
+  )}
+</div>
                 </CardContent>
               </Card>
             </div>
@@ -794,9 +801,9 @@ function App() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-blue-500 mb-1">
-                    $6
-                  </div>
+                <div className="text-2xl font-bold text-blue-500 mb-1">
+  ${costPerDay.toFixed(2)}
+</div>
                   <p className="text-xs text-gray-600">Daily protection cost</p>
                   <p className="text-xs text-gray-500 mt-1">Less than a coffee</p>
                 </CardContent>
@@ -811,8 +818,8 @@ function App() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-green-500 mb-1">
-                    1,800:1
-                  </div>
+  {roiRatio}
+</div>
                   <p className="text-xs text-gray-600">Protection to premium ratio</p>
                   <p className="text-xs text-gray-500 mt-1">Exceptional value for comprehensive coverage</p>
                 </CardContent>

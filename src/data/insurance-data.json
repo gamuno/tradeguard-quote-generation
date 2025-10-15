@@ -32,6 +32,20 @@
     "url": "https://hook.us2.make.com/w8rl7tx7kwakoheacif94hyb8eksd0hr",
     "apiKey": "manus-quote-generation"
   },
+"summaries": {
+  "coverageStrengths": [
+    "BOP bundles GL, Property, and Business Income for broad baseline protection",
+    "Umbrella adds $1M excess over GL to handle severe loss scenarios",
+    "E&O provides professional liability for consulting errors and omissions",
+    "Cyber/Breach response built into E&O with incident support and notification"
+  ],
+  "considerations": [
+    "Deductibles vary by coverage; confirm property/cyber retentions match risk tolerance",
+    "Check exclusions for subcontracted work, professional services, and cyber war/terror",
+    "Claims-made policies (E&O/Cyber) require timely reporting; consider retro dates",
+    "Review additional insured/waiver of subrogation needs for key clients"
+  ]
+},
   "policies": [
     {
       "id": "bop",
