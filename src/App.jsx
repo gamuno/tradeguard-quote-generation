@@ -172,22 +172,16 @@ const computePlanForCount = (policy, count) => {
   const po = policy?.paymentOptions
   const inst = po?.installments
   if (!po || !inst) return null
+
   const base = Number(po.totalPremium ?? policy.premium ?? 0)
-  const downPct = Number(inst.downPaymentPercent || 0)
-  const downPayment = downPct > 0 ? (base * (downPct / 100)) : 0
-  const financed = Math.max(base - downPayment, 0)
-  const fee = resolveFeeForCount(inst, count)
-  const perPayment = financed / Number(count)
-  const perPaymentWithFee = perPayment + fee
+  const fee  = resolveFeeForCount(inst, count)
+
   const totalFees = fee * Number(count)
-  const totalPaid = downPayment + (perPaymentWithFee * Number(count))
+  const totalPaid = base + totalFees
+
   return {
-    count,
-    perInstallmentFee: fee,
-    downPaymentPercent: downPct,
-    downPayment,
-    perPayment,
-    perPaymentWithFee,
+    count: Number(count),
+    perInstallmentFee: fee, // kept for math/debug if needed
     totalFees,
     totalPaid
   }
@@ -226,34 +220,25 @@ const computeSelectionTotals = (plan, policies, selectedIds) => {
   const perPolicy = selected.map(p => {
     if (plan === 'full') {
       const amount = computePolicyFullAmount(p)
-      return {
-        policyId: p.id,
-        policyName: p.name,
-        type: 'full',
-        amount,
-      }
+      return { policyId: p.id, policyName: p.name, type: 'full', amount }
     }
-    // installment
     const planObj = computePlanForCount(p, Number(plan))
     return {
       policyId: p.id,
       policyName: p.name,
       type: 'installments',
       count: Number(plan),
-      perInstallmentFee: Number(planObj?.perInstallmentFee ?? 0),
-      downPaymentPercent: Number(planObj?.downPaymentPercent ?? 0),
-      downPayment: Number(planObj?.downPayment ?? 0),
-      perPayment: Number(planObj?.perPayment ?? 0),
-      perPaymentWithFee: Number(planObj?.perPaymentWithFee ?? 0),
       totalFees: Number(planObj?.totalFees ?? 0),
-      totalPaid: Number(planObj?.totalPaid ?? 0),
+      totalPaid: Number(planObj?.totalPaid ?? 0)
     }
   })
 
-  const grandTotal = perPolicy.reduce((s, row) => s + (row.type === 'full' ? row.amount : row.totalPaid || 0), 0)
+  const grandTotal = perPolicy.reduce(
+    (s, row) => s + (row.type === 'full' ? row.amount : row.totalPaid || 0),
+    0
+  )
   return { perPolicy, grandTotal }
 }
-
 
 
   // === Derived metrics ===
@@ -996,36 +981,23 @@ if (loadError || !data) {
                   if (!plan) return null
 
                   return (
-                    <div key={`p-${policy.id}-${c}`} className="rounded-xl border border-gray-200 p-5">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="space-y-1.5">
-                          <div className="text-sm text-gray-500">{policy.name}</div>
-                          <div className="text-lg font-semibold">{plan.count} Payments</div>
-
-                          <div className="text-xs text-gray-600">
-                            {plan.downPaymentPercent > 0
-                              ? <>Down Payment: <span className="font-medium">{plan.downPaymentPercent}%</span> ({fmt(plan.downPayment)})</>
-                              : <>No stated down payment</>}
-                          </div>
-
-                          <div className="text-xs text-gray-600">
-                            Fee per payment: <span className="font-medium">{fmt(plan.perInstallmentFee)}</span>
-                          </div>
-
-                          <div className="text-xs text-gray-600">
-                            Total fees: <span className="font-medium">{fmt(plan.totalFees)}</span>
-                          </div>
-                        </div>
-
-                        <div className="text-right">
-                          <div className="text-sm text-gray-500">Each Payment (estimate) </div>
-                          <div className="text-2xl font-bold leading-tight">{fmt(plan.perPaymentWithFee)}</div>
-                          <div className="text-xs text-gray-500 mt-1">
-                            Total Paid: <span className="font-medium">{fmt(plan.totalPaid)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+         <div key={`p-${policy.id}-${c}`} className="rounded-xl border border-gray-200 p-5">
+  <div className="flex items-start justify-between gap-4">
+    <div className="space-y-1.5">
+      <div className="text-sm text-gray-500">{policy.name}</div>
+      <div className="text-lg font-semibold">{c} Payments</div>
+      {plan.totalFees > 0 && (
+        <div className="text-xs text-gray-600">
+          Total fees included: <span className="font-medium">{fmt(plan.totalFees)}</span>
+        </div>
+      )}
+    </div>
+    <div className="text-right">
+      <div className="text-sm text-gray-500">Total Due</div>
+      <div className="text-2xl font-bold leading-tight">{fmt(plan.totalPaid)}</div>
+    </div>
+  </div>
+</div>
                   )
                 })}
               </div>
