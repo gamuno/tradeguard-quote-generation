@@ -933,7 +933,7 @@ if (loadError || !data) {
                 value={`count-${c}`}
                 className="flex-1 whitespace-nowrap"
               >
-                {c}-Pay
+                {c}-Payments
               </TabsTrigger>
             ))}
           </TabsList>
@@ -983,7 +983,7 @@ if (loadError || !data) {
             })()}
           </TabsContent>
 
-          {/* COUNT TABS (2-Pay, 4-Pay, 10-Pay, etc.) */}
+          {/* COUNT TABS (2-Payments, 4-Payments, 10-Payments, etc.) */}
           {allCounts.map((c) => (
             <TabsContent key={`pane-${c}`} value={`count-${c}`} className="mt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -1030,7 +1030,7 @@ if (loadError || !data) {
                 })}
               </div>
 
-              {/* N-Pay total footer */}
+              {/* N-Payments total footer */}
               {(() => {
                 const totalForCount = data.policies.reduce((sum, policy) => {
                   const counts = policy?.paymentOptions?.installments?.counts
@@ -1042,7 +1042,7 @@ if (loadError || !data) {
                 return (
                   <div className="mt-4 flex justify-end">
                     <div className="text-xl font-bold" style={{ color: brandColor }}>
-                      Total Paid ({c}-Pay): {fmt(totalForCount)}
+                      Total Paid ({c}-Payments): {fmt(totalForCount)}
                     </div>
                   </div>
                 )
@@ -1203,7 +1203,7 @@ if (loadError || !data) {
             {allowedCounts.map((c) => (
               <div key={c} className="flex items-center space-x-2 border rounded-lg p-2">
                 <RadioGroupItem value={String(c)} id={`plan-${c}`} />
-                <Label htmlFor={`plan-${c}`}>{c}-Pay</Label>
+                <Label htmlFor={`plan-${c}`}>{c}-Payments</Label>
               </div>
             ))}
           </RadioGroup>
@@ -1305,7 +1305,7 @@ if (loadError || !data) {
             {row.type === 'full' ? (
               <span>{fmt(row.amount)}</span>
             ) : (
-              <span>{row.count}-Pay · Total {fmt(row.totalPaid)}</span>
+              <span>{row.count}-Payments · Total {fmt(row.totalPaid)}</span>
             )}
           </div>
         ))}
@@ -1313,7 +1313,7 @@ if (loadError || !data) {
         <div className="border-t mt-2 pt-2 font-bold">
           <div className="flex justify-between">
             <span>
-              Total ({selectedPaymentPlan === 'full' ? 'Full Pay' : `${selectedPaymentPlan}-Pay`}):
+              Total ({selectedPaymentPlan === 'full' ? 'Full Pay' : `${selectedPaymentPlan}-Payments`}):
             </span>
             <span className="text-[#FF5F46]">{fmt(grandTotal)}</span>
           </div>
