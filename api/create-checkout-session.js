@@ -34,7 +34,6 @@ export default async function handler(req, res) {
     const session = await stripe.checkout.sessions.create({
       mode: 'setup',                                    // collect payment method only
       payment_method_types: ['card', 'us_bank_account'],
-      payment_method_collection: 'always',              // force collection even if exists
       customer_creation: 'always',                      // make sure a Customer is created
       success_url: successUrl,
       cancel_url: cancelUrl,
