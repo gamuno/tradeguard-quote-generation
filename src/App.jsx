@@ -4,10 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge.jsx'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.jsx'
 import { Progress } from '@/components/ui/progress.jsx'
-import { Input } from '@/components/ui/input.jsx'
 import { Label } from '@/components/ui/label.jsx'
 import { Textarea } from '@/components/ui/textarea.jsx'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
 import { Checkbox } from '@/components/ui/checkbox.jsx'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group.jsx'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.jsx'
@@ -62,28 +60,9 @@ function App() {
   
   // Next Steps form states
   const [selectedPolicies, setSelectedPolicies] = useState([])
-  const [paymentMethod, setPaymentMethod] = useState('')
   const [declineReason, setDeclineReason] = useState('')
   const [comments, setComments] = useState('')
-  const [showPaymentForm, setShowPaymentForm] = useState(false)
   const [showDeclineForm, setShowDeclineForm] = useState(false)
-  const [showConfirmation, setShowConfirmation] = useState(false)
-  const [submissionType, setSubmissionType] = useState('')
-
-
-  // Credit card form states
-  const [cardNumber, setCardNumber] = useState('')
-  const [expiryDate, setExpiryDate] = useState('')
-  const [cvv, setCvv] = useState('')
-  const [cardholderName, setCardholderName] = useState('')
-
-  // Bank account form states
-  const [accountNumber, setAccountNumber] = useState('')
-  const [routingNumber, setRoutingNumber] = useState('')
-  const [accountHolderName, setAccountHolderName] = useState('')
-  const [accountType, setAccountType] = useState('')
-
-
 
   // FAQ state
   const [openFAQ, setOpenFAQ] = useState(null)
@@ -97,7 +76,16 @@ const [loadError, setLoadError] = useState(null);
 useEffect(() => {
   (async () => {
     try {
-      const id = new URLSearchParams(window.location.search).get('id');
+      const params = new URLSearchParams(window.location.search);
+      const urlId = params.get('id');
+
+      // Works in both Vite and Next:
+      const isDev =
+        (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production') ||
+        (typeof process !== 'undefined' && process.env && process.env.NODE_ENV !== 'production');
+
+      // Fallback to demo in dev if no id is provided
+      const id = urlId || (isDev ? 'demo' : null);
       if (!id) throw new Error('Missing id');
 
       const res = await fetch(`/quotes/${encodeURIComponent(id)}.json`, {
@@ -116,7 +104,6 @@ useEffect(() => {
     }
   })();
 }, []);
-
 
   
 const brandColor = data?.branding?.primaryColor || '#FF5F46'
@@ -304,60 +291,6 @@ const considerations = data?.summaries?.considerations ?? []
     } catch (error) {
       console.error('Webhook submission failed:', error)
       return false
-    }
-  }
-
-  const handleAcceptSubmission = async () => {
-    // Build plan-aware totals & per-policy breakdown
-    const { perPolicy, grandTotal } = computeSelectionTotals(
-      selectedPaymentPlan,   // 'full' or a number (count)
-      data.policies,
-      selectedPolicies
-    )
-  
-    const payload = {
-      client_name: data.client.name,
-      decision: 'accept',
-      selected_policies: selectedPolicies,
-  
-      // NEW: chosen plan summarized for downstream logic
-      payment_plan: selectedPaymentPlan === 'full'
-        ? { type: 'full', count: 1 }
-        : { type: 'installments', count: Number(selectedPaymentPlan) },
-  
-      // NEW: per-policy details (amounts, fees, down payment, etc. when installments)
-      payment_breakdown: perPolicy,
-  
-      // NEW: grand total for the chosen plan (sum across selected policies)
-      total_due: grandTotal,
-  
-      // Existing: payment method + limited details
-      payment_method: paymentMethod,
-      payment_details:
-        paymentMethod === 'credit_card'
-          ? {
-              card_number_last4: cardNumber.replace(/\s+/g, '').slice(-4),
-              cardholder_name: cardholderName,
-              expiry: expiryDate
-            }
-          : {
-              account_holder_name: accountHolderName,
-              routing_last4: routingNumber.replace(/\s+/g, '').slice(-4),
-              account_type: accountType
-            },
-  
-      agent_email: data.agent.email,
-      submission_date: new Date().toISOString().split('T')[0],
-      presentation_url: window.location.href
-    }
-  
-    const success = await submitWebhook(payload)
-    if (success) {
-      setSubmissionType('accept')
-      setShowConfirmation(true)
-      setShowPaymentForm(false)
-    } else {
-      console.error('Webhook submission failed')
     }
   }
   
@@ -1117,7 +1050,7 @@ if (loadError || !data) {
               <p className="text-lg text-gray-600">Ready to secure your protection or need more information?</p>
             </div>
 
-            {!showPaymentForm && !showDeclineForm && !showConfirmation && (
+            {!showDeclineForm && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <Card>
                   <CardHeader>
@@ -1191,13 +1124,52 @@ if (loadError || !data) {
     )
   })()}
 
-  <Button 
-    className="w-full bg-[#FF5F46] hover:bg-[#FF5F46]/90"
-    disabled={selectedPolicies.length === 0}
-    onClick={() => setShowPaymentForm(true)}
-  >
-    Proceed to Payment
-  </Button>
+<Button
+  className="w-full bg-[#FF5F46] hover:bg-[#FF5F46]/90"
+  disabled={selectedPolicies.length === 0}
+  onClick={async () => {
+    // Build totals you already compute
+    const { perPolicy, grandTotal } = computeSelectionTotals(
+      selectedPaymentPlan, // 'full' or a number
+      data.policies,
+      selectedPolicies
+    )
+
+    // Convert to cents for Stripe
+    const policiesForStripe = perPolicy.map(row => ({
+      id: row.policyId,
+      name: row.policyName,
+      amountCents: Math.round(
+        (row.type === 'full' ? row.amount : row.totalPaid || 0) * 100
+      ),
+      totalPaidCents: row.type === 'full' ? undefined : Math.round((row.totalPaid || 0) * 100),
+      count: row.count || (row.type === 'full' ? 1 : undefined),
+      type: row.type
+    }))
+
+    const res = await fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quoteId: new URLSearchParams(window.location.search).get('id'),
+        client: { name: data.client.name, email: data.client.email || '' },
+        agent: { email: data.agent.email },
+        selection: {
+          plan: selectedPaymentPlan,
+          policies: policiesForStripe,
+          grandTotalCents: Math.round(grandTotal * 100),
+        },
+        // optional if you want to override env:
+        // makeWebhookUrl: data.webhook.url
+      })
+    })
+
+    const { url } = await res.json()
+    if (url) window.location.href = url
+  }}
+>
+  Proceed to Payment
+</Button>
 </CardContent>
 
                 </Card>
@@ -1251,182 +1223,6 @@ if (loadError || !data) {
               </div>
             )}
 
-            {showPaymentForm && (
-              <Card className="max-w-2xl mx-auto">
-                <CardHeader>
-                  <CardTitle>Payment Information</CardTitle>
-                  <CardDescription>Choose your payment method to secure your coverage</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                <div className="bg-gray-50 p-4 rounded-lg">
-  <h4 className="font-semibold mb-2">Selected Coverage:</h4>
-
-  {(() => {
-    const { perPolicy, grandTotal } = computeSelectionTotals(
-      selectedPaymentPlan,   // 'full' or a number (count)
-      data.policies,
-      selectedPolicies
-    )
-
-    return (
-      <>
-        {/* per-policy rows reflect the chosen plan */}
-        {perPolicy.map(row => (
-          <div key={row.policyId} className="flex justify-between text-sm">
-            <span>{row.policyName}</span>
-            {row.type === 'full' ? (
-              <span>{fmt(row.amount)}</span>
-            ) : (
-              <span>{row.count}-Payments · Total {fmt(row.totalPaid)}</span>
-            )}
-          </div>
-        ))}
-
-        <div className="border-t mt-2 pt-2 font-bold">
-          <div className="flex justify-between">
-            <span>
-              Total ({selectedPaymentPlan === 'full' ? 'Full Pay' : `${selectedPaymentPlan}-Payments`}):
-            </span>
-            <span className="text-[#FF5F46]">{fmt(grandTotal)}</span>
-          </div>
-        </div>
-      </>
-    )
-  })()}
-</div>
-
-
-                  <div className="space-y-4">
-                    <Label>Payment Method:</Label>
-                    <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="credit_card" id="credit_card" />
-                        <Label htmlFor="credit_card" className="flex items-center space-x-2">
-                          <CreditCard className="h-4 w-4" />
-                          <span>Credit Card</span>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="bank_account" id="bank_account" />
-                        <Label htmlFor="bank_account" className="flex items-center space-x-2">
-                          <Banknote className="h-4 w-4" />
-                          <span>Bank Account (ACH)</span>
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-
-                  {paymentMethod === 'credit_card' && (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="cardNumber">Card Number</Label>
-                          <Input
-                            id="cardNumber"
-                            placeholder="1234 5678 9012 3456"
-                            value={cardNumber}
-                            onChange={(e) => setCardNumber(e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="cardholderName">Cardholder Name</Label>
-                          <Input
-                            id="cardholderName"
-                            placeholder="John Doe"
-                            value={cardholderName}
-                            onChange={(e) => setCardholderName(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="expiryDate">Expiry Date</Label>
-                          <Input
-                            id="expiryDate"
-                            placeholder="MM/YY"
-                            value={expiryDate}
-                            onChange={(e) => setExpiryDate(e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="cvv">CVV</Label>
-                          <Input
-                            id="cvv"
-                            placeholder="123"
-                            value={cvv}
-                            onChange={(e) => setCvv(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {paymentMethod === 'bank_account' && (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="accountNumber">Account Number</Label>
-                          <Input
-                            id="accountNumber"
-                            placeholder="123456789"
-                            value={accountNumber}
-                            onChange={(e) => setAccountNumber(e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="routingNumber">Routing Number</Label>
-                          <Input
-                            id="routingNumber"
-                            placeholder="021000021"
-                            value={routingNumber}
-                            onChange={(e) => setRoutingNumber(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="accountHolderName">Account Holder Name</Label>
-                          <Input
-                            id="accountHolderName"
-                            placeholder="John Doe"
-                            value={accountHolderName}
-                            onChange={(e) => setAccountHolderName(e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="accountType">Account Type</Label>
-                          <Select value={accountType} onValueChange={setAccountType}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="checking">Checking</SelectItem>
-                              <SelectItem value="savings">Savings</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex space-x-4">
-                    <Button variant="outline" onClick={() => setShowPaymentForm(false)}>
-                      Back
-                    </Button>
-                    <Button 
-                      className="flex-1 bg-[#FF5F46] hover:bg-[#FF5F46]/90"
-                      onClick={handleAcceptSubmission}
-                      disabled={!paymentMethod || 
-                        (paymentMethod === 'credit_card' && (!cardNumber || !cardholderName || !expiryDate || !cvv)) ||
-                        (paymentMethod === 'bank_account' && (!accountNumber || !routingNumber || !accountHolderName || !accountType))
-                      }
-                    >
-                      Secure My Coverage
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
 
             {showDeclineForm && (
               <Card className="max-w-2xl mx-auto">
@@ -1450,54 +1246,6 @@ if (loadError || !data) {
                     >
                       Submit Feedback
                     </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {showConfirmation && (
-              <Card className="max-w-2xl mx-auto">
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <CheckCircle className="h-6 w-6 text-green-500" />
-                    <span>
-                      {submissionType === 'accept' ? 'Coverage Application Submitted!' : 'Feedback Submitted!'}
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {submissionType === 'accept' ? (
-                    <div>
-                      <p className="text-gray-600 mb-4">
-                        Thank you for choosing our insurance protection. Your application has been submitted successfully.
-                      </p>
-                      <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
-                        <h4 className="font-semibold text-green-800 mb-2">What happens next:</h4>
-                        <ul className="text-sm text-green-700 space-y-1">
-                          <li>• Your agent will contact you within 24 hours</li>
-                          <li>• We'll process your application and payment</li>
-                          <li>• You'll receive policy documents via email</li>
-                          <li>• Coverage becomes effective on {data.quote.effectiveDate}</li>
-                        </ul>
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <p className="text-gray-600 mb-4">
-                        Thank you for your feedback. We appreciate you taking the time to review our proposal.
-                      </p>
-                      <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-                        <p className="text-sm text-blue-700">
-                          Your agent may follow up with you to address any concerns or provide additional information.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="text-center pt-4">
-                    <p className="text-sm text-gray-500">
-                      Questions? Contact {data.agent.name} at {data.agent.phone} or {data.agent.email}
-                    </p>
                   </div>
                 </CardContent>
               </Card>

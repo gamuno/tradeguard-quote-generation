@@ -1,1 +1,16 @@
 node_modules
+# node / tooling
+node_modules/
+pnpm-lock.yaml
+yarn.lock
+*.log
+
+# Vite / build
+dist/
+.vite/
+.vscode/
+.DS_Store
+
+# Local env
+.env
+.env.*

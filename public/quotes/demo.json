@@ -1,0 +1,46 @@
+{
+    "branding": { "primaryColor": "#FF5F46", "logoUrl": "/logo.svg" },
+    "client": { "name": "C&S Woodshop", "email": "owner@example.com" },
+    "agent": { "name": "Garrett Amundsen", "company": "TradeGuard Insurance", "email": "garrett@tradeguardins.com", "phone": "913-555-0100", "headshotUrl": "/agent.png" },
+    "carrier": { "name": "SampleCarrier" },
+    "quote": { "validity": "30 days", "effectiveDate": "2025-11-01" },
+    "webhook": { "url": "https://hook.make.com/your-id", "apiKey": "xyz" },
+    "policies": [
+      {
+        "id": "gl",
+        "name": "General Liability",
+        "description": "Bodily injury & property damage",
+        "icon": "Shield",
+        "color": "bg-orange-500",
+        "premium": 1800,
+        "limits": { "occurrence": 1000000, "aggregate": 2000000, "total": 2000000 },
+        "paymentOptions": {
+          "totalPremium": 1800,
+          "fullPay": { "amount": 1800, "discountAmount": 0 },
+          "installments": { "counts": [2, 4], "perInstallmentFee": 10, "overrides": [] }
+        },
+        "coverageExamples": { "covered": ["Jobsite slip & fall"], "notCovered": ["Intentional damage"] }
+      },
+      {
+        "id": "wc",
+        "name": "Workers Comp",
+        "description": "Employee injuries",
+        "icon": "Users",
+        "color": "bg-blue-500",
+        "premium": 3200,
+        "limits": { "statutory": "Statutory", "employerLiability": 1000000, "total": 1000000 },
+        "paymentOptions": {
+          "totalPremium": 3200,
+          "fullPay": { "amount": 3200, "discountAmount": 0 },
+          "installments": { "counts": [2, 4], "perInstallmentFee": 15, "overrides": [] }
+        },
+        "coverageExamples": { "covered": ["Slip injury at shop"], "notCovered": ["Contractor not on payroll"] }
+      }
+    ],
+    "comparisonMatrix": [
+      { "coverageArea": "Annual Premium", "policies": ["$1,800", "$3,200"] },
+      { "coverageArea": "Bodily Injury", "policies": ["Covered", "—"] }
+    ],
+    "summaries": { "coverageStrengths": ["Strong GL limits"], "considerations": ["WC audit exposure"] }
+  }
+  
