@@ -106,7 +106,26 @@ useEffect(() => {
   })();
 }, []);
 
-  
+// === ePayPolicy Prefill helpers ===
+const EPAY_BASE = "https://gmpeters.epaypolicy.com";
+
+const toUSDString = (n) => {
+  const num = Number(n || 0);
+  return num.toFixed(2); // ePay expects 2-decimals in the query
+};
+
+const buildEpayPrefillUrl = ({ amount, insuredName, insuredEmail, comments }) => {
+  const params = new URLSearchParams({
+    amount: toUSDString(amount),
+    // ePay also supports Name & EmailAddress on most branded pages.
+    // If your page doesn't accept them, you can remove these two:
+    Name: insuredName || "",
+    EmailAddress: insuredEmail || "",
+    comments: comments || "",
+  });
+  return `${EPAY_BASE}?${params.toString()}`;
+};
+
 const brandColor = data?.branding?.primaryColor || '#FF5F46'
 
 // SAFE when data is still null
@@ -1129,45 +1148,33 @@ if (loadError || !data) {
   className="w-full bg-[#FF5F46] hover:bg-[#FF5F46]/90"
   disabled={selectedPolicies.length === 0}
   onClick={async () => {
-    // Build totals you already compute
-    const { perPolicy, grandTotal } = computeSelectionTotals(
-      selectedPaymentPlan, // 'full' or a number
-      data.policies,
-      selectedPolicies
-    )
+  // 1) Figure out the selected totals using your existing helpers
+  const { perPolicy, grandTotal } = computeSelectionTotals(
+    selectedPaymentPlan, // 'full' or number (installment count)
+    data.policies,
+    selectedPolicies
+  );
 
-    // Convert to cents for Stripe
-    const policiesForStripe = perPolicy.map(row => ({
-      id: row.policyId,
-      name: row.policyName,
-      amountCents: Math.round(
-        (row.type === 'full' ? row.amount : row.totalPaid || 0) * 100
-      ),
-      totalPaidCents: row.type === 'full' ? undefined : Math.round((row.totalPaid || 0) * 100),
-      count: row.count || (row.type === 'full' ? 1 : undefined),
-      type: row.type
-    }))
+  // 2) Prepare a clean list of selected policy names for the comments
+  const selectedPolicyNames = perPolicy.map(p => p.policyName).join(", ");
 
-    const res = await fetch('/api/create-checkout-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        quoteId: new URLSearchParams(window.location.search).get('id'),
-        client: { name: data.client.name, email: data.client.email || '' },
-        agent: { email: data.agent.email },
-        selection: {
-          plan: selectedPaymentPlan,
-          policies: policiesForStripe,
-          grandTotalCents: Math.round(grandTotal * 100),
-        },
-        // optional if you want to override env:
-        // makeWebhookUrl: data.webhook.url
-      })
-    })
+  // 3) Compose a TG-only signature in Comments (so your email-based Make flow can match it)
+  const quoteId = new URLSearchParams(window.location.search).get('id') || 'demo';
+  const planLabel = selectedPaymentPlan === 'full' ? 'Full Pay' : `${selectedPaymentPlan}-Payments`;
+  const comments = `TradeGuard Payment. Insured: ${data.client.name}. QuoteId: ${quoteId}. Plan: ${planLabel}. Selected Policies: ${selectedPolicyNames}`;
 
-    const { url } = await res.json()
-    if (url) window.location.href = url
-  }}
+  // 4) Build the ePay URL (amount in dollars w/ 2 decimals)
+  const epayUrl =
+  `https://gmpeters.epaypolicy.com?` +
+  `amount=${encodeURIComponent(toUSDString(grandTotal))}&` +
+  `comments=${encodeURIComponent(
+    `TradeGuard Payment. Insured: ${data.client.name}. QuoteId: ${quoteId}. Plan: ${planLabel}. Selected Policies: ${selectedPolicyNames}`
+  )}`;
+
+
+  // 5) Open ePay in a new tab (or same tab if you prefer)
+  window.open(epayUrl, "_blank", "noopener,noreferrer");
+}}
 >
   Proceed to Payment
 </Button>
