@@ -64,6 +64,8 @@ function App() {
   const [declineReason, setDeclineReason] = useState('')
   const [comments, setComments] = useState('')
   const [showDeclineForm, setShowDeclineForm] = useState(false)
+  const [submittingDecline, setSubmittingDecline] = useState(false)
+  const [showDeclineSuccess, setShowDeclineSuccess] = useState(false)
 
   // FAQ state
   const [openFAQ, setOpenFAQ] = useState(null)
@@ -313,25 +315,25 @@ const considerations = data?.summaries?.considerations ?? []
   }
   
 
-  const handleDeclineSubmission = async () => {
-    const payload = {
-      client_name: data.client.name,
-      decision: 'decline',
-      decline_reason: declineReason,
-      comments: comments,
-      total_premium: totalPremium,
-      agent_email: data.agent.email,
-      submission_date: new Date().toISOString().split('T')[0],
-      presentation_url: window.location.href
-    }
-
-    const success = await submitWebhook(payload)
-    if (success) {
-      setSubmissionType('decline')
-      setShowConfirmation(true)
-      setShowDeclineForm(false)
-    }
+const handleDeclineSubmission = async () => {
+  const payload = {
+    client_name: data.client.name,
+    decision: 'decline',
+    decline_reason: declineReason,
+    comments: comments,
+    total_premium: totalPremium,
+    agent_email: data.agent.email,
+    submission_date: new Date().toISOString().split('T')[0],
+    presentation_url: window.location.href
   }
+
+  const success = await submitWebhook(payload)
+  if (success) {
+    setShowDeclineForm(false)     // hide the form
+    setShowDeclineSuccess(true)   // show the confirmation page
+  }
+}
+
 
   // Scrollable navigation functions
   const scrollLeft = () => {
@@ -1067,8 +1069,32 @@ if (loadError || !data) {
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Next Steps</h2>
               <p className="text-lg text-gray-600">Ready to secure your protection or need more information?</p>
             </div>
+    {/* NEW: Decline confirmation page */}
+    {showDeclineSuccess && (
+      <Card className="max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle>Thanks — your decision was recorded</CardTitle>
+          <CardDescription>We’ve received your decline feedback.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="bg-gray-50 p-4 rounded-lg text-sm text-gray-700">
+            <p><strong>Client:</strong> {data.client.name}</p>
+            <p><strong>Reason:</strong> {declineReason.replace('-', ' ') || '—'}</p>
+            {comments && <p><strong>Comments:</strong> {comments}</p>}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Button className="w-full" onClick={() => setActiveSection('overview')}>
+              Return to Overview
+            </Button>
+            <Button variant="outline" className="w-full" onClick={() => setShowDeclineSuccess(false)}>
+              Go Back
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )}
 
-            {!showDeclineForm && (
+            {!showDeclineSuccess && !showDeclineForm && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <Card>
                   <CardHeader>
@@ -1247,7 +1273,7 @@ if (loadError || !data) {
             )}
 
 
-            {showDeclineForm && (
+            {!showDeclineSuccess && showDeclineForm && (
               <Card className="max-w-2xl mx-auto">
                 <CardHeader>
                   <CardTitle>Confirm Decline</CardTitle>
