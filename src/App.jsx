@@ -106,25 +106,23 @@ useEffect(() => {
   })();
 }, []);
 
-// === ePayPolicy Prefill helpers ===
+// === ePayPolicy Prefill helpers (replace or add) ===
 const EPAY_BASE = "https://gmpeters.epaypolicy.com";
 
 const toUSDString = (n) => {
   const num = Number(n || 0);
-  return num.toFixed(2); // ePay expects 2-decimals in the query
+  return num.toFixed(2); // 2 decimals for the query param
 };
 
-const buildEpayPrefillUrl = ({ amount, insuredName, insuredEmail, comments }) => {
+// Builds: https://gmpeters.epaypolicy.com?amount=123.45&comments=...
+const buildEpayPrefillUrl = ({ amount, comments }) => {
   const params = new URLSearchParams({
     amount: toUSDString(amount),
-    // ePay also supports Name & EmailAddress on most branded pages.
-    // If your page doesn't accept them, you can remove these two:
-    Name: insuredName || "",
-    EmailAddress: insuredEmail || "",
-    comments: comments || "",
+    comments // URLSearchParams will encode newlines as %0A, etc.
   });
   return `${EPAY_BASE}?${params.toString()}`;
 };
+
 
 const brandColor = data?.branding?.primaryColor || '#FF5F46'
 
@@ -1148,33 +1146,50 @@ if (loadError || !data) {
   className="w-full bg-[#FF5F46] hover:bg-[#FF5F46]/90"
   disabled={selectedPolicies.length === 0}
   onClick={async () => {
-  // 1) Figure out the selected totals using your existing helpers
+  // compute totals with your existing helper
   const { perPolicy, grandTotal } = computeSelectionTotals(
-    selectedPaymentPlan, // 'full' or number (installment count)
+    selectedPaymentPlan, // 'full' or number
     data.policies,
     selectedPolicies
   );
 
-  // 2) Prepare a clean list of selected policy names for the comments
+  // list of selected policy names for the Notes line
   const selectedPolicyNames = perPolicy.map(p => p.policyName).join(", ");
 
-  // 3) Compose a TG-only signature in Comments (so your email-based Make flow can match it)
-  const quoteId = new URLSearchParams(window.location.search).get('id') || 'demo';
+  // label for plan line
   const planLabel = selectedPaymentPlan === 'full' ? 'Full Pay' : `${selectedPaymentPlan}-Payments`;
-  const comments = `TradeGuard Payment. Insured: ${data.client.name}. QuoteId: ${quoteId}. Plan: ${planLabel}. Selected Policies: ${selectedPolicyNames}`;
 
-  // 4) Build the ePay URL (amount in dollars w/ 2 decimals)
-  const epayUrl =
-  `https://gmpeters.epaypolicy.com?` +
-  `amount=${encodeURIComponent(toUSDString(grandTotal))}&` +
-  `comments=${encodeURIComponent(
-    `TradeGuard Payment. Insured: ${data.client.name}. QuoteId: ${quoteId}. Plan: ${planLabel}. Selected Policies: ${selectedPolicyNames}`
-  )}`;
+  // quote id from URL (your page already uses this)
+  const quoteId = new URLSearchParams(window.location.search).get('id') || 'demo';
 
+  // === NEW: Notes/Comments EXACTLY as requested (multi-line) ===
+  //   TradeGuard Payment
+  //   Client Name: ...
+  //   Decision: accept
+  //   Selected Policies: ...
+  //   Payment Plan: ...
+  //   Total Due: ...
+  //   Quote ID: ...
+  const comments = [
+    `TradeGuard Payment`,
+    `Client Name: ${data.client.name}`,
+    `Decision: accept`,
+    `Selected Policies: ${selectedPolicyNames}`,
+    `Payment Plan: ${planLabel}`,
+    `Total Due: ${toUSDString(grandTotal)}`,
+    `Quote ID: ${quoteId}`
+  ].join("\n"); // newline-separated (becomes %0A in the URL)
 
-  // 5) Open ePay in a new tab (or same tab if you prefer)
+  // Build the ePay URL with amount + comments
+  const epayUrl = buildEpayPrefillUrl({
+    amount: grandTotal,
+    comments
+  });
+
+  // Open ePay in a new tab (keeps your presentation page intact)
   window.open(epayUrl, "_blank", "noopener,noreferrer");
 }}
+
 >
   Proceed to Payment
 </Button>
