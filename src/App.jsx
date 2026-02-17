@@ -581,7 +581,7 @@ if (loadError || !data) {
             </div>
 
             {taxesAndFees >= 0 && (
-              <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 max-w-md">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 w-full">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Taxes, fees & misc.</span>
                   <span className="font-semibold text-gray-900">${taxesAndFees.toLocaleString()}</span>
