@@ -2,63 +2,146 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Insurance Presentation Data Schema",
   "type": "object",
-  "required": ["client", "agent", "carrier", "quote", "branding", "webhook", "policies", "comparisonMatrix"],
+  "required": [
+    "client",
+    "agent",
+    "carrier",
+    "quote",
+    "branding",
+    "webhook",
+    "policies",
+    "comparisonMatrix"
+  ],
   "properties": {
     "client": {
       "type": "object",
-      "required": ["name", "address", "industry"],
+      "required": [
+        "name",
+        "address",
+        "industry"
+      ],
       "properties": {
-        "name": { "type": "string" },
-        "address": { "type": "string" },
-        "industry": { "type": "string" }
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "industry": {
+          "type": "string"
+        }
       }
     },
     "agent": {
       "type": "object",
-      "required": ["name", "company", "phone", "email", "headshotUrl"],
+      "required": [
+        "name",
+        "company",
+        "phone",
+        "email",
+        "headshotUrl"
+      ],
       "properties": {
-        "name": { "type": "string" },
-        "company": { "type": "string" },
-        "phone": { "type": "string" },
-        "email": { "type": "string", "format": "email" },
-        "address": { "type": "string" },
-        "headshotUrl": { "type": "string", "format": "uri" }
+        "name": {
+          "type": "string"
+        },
+        "company": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "address": {
+          "type": "string"
+        },
+        "headshotUrl": {
+          "type": "string",
+          "format": "uri"
+        }
       }
     },
     "carrier": {
       "type": "object",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "properties": {
-        "name": { "type": "string" },
-        "amRating": { "type": "string" },
-        "financialStrength": { "type": "string" }
+        "name": {
+          "type": "string"
+        },
+        "amRating": {
+          "type": "string"
+        },
+        "financialStrength": {
+          "type": "string"
+        }
       }
     },
     "quote": {
       "type": "object",
-      "required": ["number", "date", "validity", "effectiveDate"],
+      "required": [
+        "number",
+        "date",
+        "validity",
+        "effectiveDate"
+      ],
       "properties": {
-        "number": { "type": "string" },
-        "date": { "type": "string" },
-        "validity": { "type": "string" },
-        "effectiveDate": { "type": "string" },
-        "expirationDate": { "type": "string" }
+        "number": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "validity": {
+          "type": "string"
+        },
+        "effectiveDate": {
+          "type": "string"
+        },
+        "expirationDate": {
+          "type": "string"
+        },
+        "taxesAndFees": {
+          "type": "number",
+          "minimum": 0
+        }
       }
     },
     "branding": {
       "type": "object",
-      "required": ["primaryColor", "logoUrl"],
+      "required": [
+        "primaryColor",
+        "logoUrl"
+      ],
       "properties": {
-        "primaryColor": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
-        "logoUrl": { "type": "string", "format": "uri" }
+        "primaryColor": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "logoUrl": {
+          "type": "string",
+          "format": "uri"
+        }
       }
     },
     "webhook": {
       "type": "object",
-      "required": ["url", "apiKey"],
+      "required": [
+        "url",
+        "apiKey"
+      ],
       "properties": {
-        "url": { "type": "string", "format": "uri" },
-        "apiKey": { "type": "string" }
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "apiKey": {
+          "type": "string"
+        }
       }
     },
     "policies": {
@@ -66,43 +149,94 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["id", "name", "description", "icon", "color", "premium", "limits", "keyFeatures", "coverageExamples"],
+        "required": [
+          "id",
+          "name",
+          "description",
+          "icon",
+          "color",
+          "premium",
+          "limits",
+          "keyFeatures",
+          "coverageExamples"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "shortName": { "type": "string" },
-          "description": { "type": "string" },
-          "fullDescription": { "type": "string" },
-          "icon": { "type": "string" },
-          "color": { "type": "string" },
-          "premium": { "type": "number", "minimum": 0 },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "shortName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "fullDescription": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "premium": {
+            "type": "number",
+            "minimum": 0
+          },
           "limits": {
             "type": "object",
-            "required": ["total"],
+            "required": [
+              "total"
+            ],
             "properties": {
-              "total": { "type": "number", "minimum": 0 }
+              "total": {
+                "type": "number",
+                "minimum": 0
+              }
             },
-            "additionalProperties": { "type": ["number", "string"] }
+            "additionalProperties": {
+              "type": [
+                "number",
+                "string"
+              ]
+            }
           },
           "deductibles": {
             "type": "object",
-            "additionalProperties": { "type": ["number", "string"] }
+            "additionalProperties": {
+              "type": [
+                "number",
+                "string"
+              ]
+            }
           },
           "keyFeatures": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           },
           "coverageExamples": {
             "type": "object",
-            "required": ["covered", "notCovered"],
+            "required": [
+              "covered",
+              "notCovered"
+            ],
             "properties": {
               "covered": {
                 "type": "array",
-                "items": { "type": "string" }
+                "items": {
+                  "type": "string"
+                }
               },
               "notCovered": {
                 "type": "array",
-                "items": { "type": "string" }
+                "items": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -113,12 +247,19 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["coverageArea", "policies"],
+        "required": [
+          "coverageArea",
+          "policies"
+        ],
         "properties": {
-          "coverageArea": { "type": "string" },
+          "coverageArea": {
+            "type": "string"
+          },
           "policies": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           }
         }
       }

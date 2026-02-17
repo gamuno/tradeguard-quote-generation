@@ -109,7 +109,7 @@ useEffect(() => {
 }, []);
 
 // === ePayPolicy Prefill helpers (replace or add) ===
-const EPAY_BASE = "https://gmpeters.epaypolicy.com";
+const EPAY_BASE = "https://bukaty.epaypolicy.com";
 
 const toUSDString = (n) => {
   const num = Number(n || 0);
@@ -130,6 +130,8 @@ const brandColor = data?.branding?.primaryColor || '#FF5F46'
 
 // SAFE when data is still null
 const totalPremium = (data?.policies ?? []).reduce((sum, policy) => sum + (Number(policy.premium) || 0), 0)
+const taxesAndFees = Number(data?.quote?.taxesAndFees) || 0
+const totalWithTaxesAndFees = totalPremium + taxesAndFees
 const totalProtection = (data?.policies ?? []).reduce((sum, policy) => sum + (Number(policy?.limits?.total) || 0), 0)
   // existing
 const fmt = (n) =>
@@ -321,7 +323,7 @@ const handleDeclineSubmission = async () => {
     decision: 'decline',
     decline_reason: declineReason,
     comments: comments,
-    total_premium: totalPremium,
+    total_premium: totalWithTaxesAndFees,
     agent_email: data.agent.email,
     submission_date: new Date().toISOString().split('T')[0],
     presentation_url: window.location.href
@@ -495,7 +497,7 @@ if (loadError || !data) {
       <div className="flex items-center justify-between mb-3 sm:mb-0">
         <img src={data.branding.logoUrl} alt={`${data.agent.company} Insurance`} className="h-6 sm:h-8" />
         <div className="text-right">
-          <div className="text-lg sm:text-2xl font-bold text-[#FF5F46]">${totalPremium.toLocaleString()}</div>
+          <div className="text-lg sm:text-2xl font-bold text-[#FF5F46]">${totalWithTaxesAndFees.toLocaleString()}</div>
           <div className="text-xs sm:text-sm text-gray-500">Total Annual Premium</div>
         </div>
       </div>
@@ -577,6 +579,15 @@ if (loadError || !data) {
                 />
               ))}
             </div>
+
+            {taxesAndFees >= 0 && (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 max-w-md">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Taxes, fees & misc.</span>
+                  <span className="font-semibold text-gray-900">${taxesAndFees.toLocaleString()}</span>
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="shadow-sm border-0 bg-white">
@@ -835,10 +846,14 @@ if (loadError || !data) {
                         <span className="font-semibold">${policy.premium}</span>
                       </div>
                     ))}
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Taxes, fees & misc.</span>
+                      <span className="font-semibold">${taxesAndFees.toLocaleString()}</span>
+                    </div>
                     <div className="border-t pt-4">
                       <div className="flex justify-between items-center text-lg font-bold">
                         <span>Total Annual Premium</span>
-                        <span className="text-[#FF5F46]">${totalPremium}</span>
+                        <span className="text-[#FF5F46]">${totalWithTaxesAndFees.toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
@@ -1162,7 +1177,7 @@ if (loadError || !data) {
           <span>
             Selected Total ({selectedPaymentPlan === 'full' ? 'Full Pay' : `${selectedPaymentPlan}-Payments`}):
           </span>
-          <span className="text-[#FF5F46]">{fmt(grandTotal)}</span>
+          <span className="text-[#FF5F46]">{fmt(grandTotal + taxesAndFees)}</span>
         </div>
       </>
     )
@@ -1178,6 +1193,8 @@ if (loadError || !data) {
     data.policies,
     selectedPolicies
   );
+
+  const amountWithTaxesAndFees = grandTotal + taxesAndFees;
 
   // list of selected policy names for the Notes line
   const selectedPolicyNames = perPolicy.map(p => p.policyName).join(", ");
@@ -1202,13 +1219,13 @@ if (loadError || !data) {
     `Decision: accept`,
     `Selected Policies: ${selectedPolicyNames}`,
     `Payment Plan: ${planLabel}`,
-    `Total Due: ${toUSDString(grandTotal)}`,
+    `Total Due: ${toUSDString(amountWithTaxesAndFees)}`,
     `Quote ID: ${quoteId}`
   ].join("\n"); // newline-separated (becomes %0A in the URL)
 
-  // Build the ePay URL with amount + comments
+  // Build the ePay URL with amount + comments (amount includes taxes & fees)
   const epayUrl = buildEpayPrefillUrl({
-    amount: grandTotal,
+    amount: amountWithTaxesAndFees,
     comments
   });
 

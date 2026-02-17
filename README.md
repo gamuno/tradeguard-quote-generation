@@ -215,18 +215,34 @@ The app uses Lucide React icons. Available icons include:
 
 ## Deployment
 
-### Build for Production
-```bash
-npm run build
-```
+### 1. Deploy the app (this repo)
 
-### Deploy to Static Hosting
-The `dist` folder contains all static files ready for deployment to:
-- Netlify
-- Vercel
-- AWS S3
-- GitHub Pages
-- Any static hosting service
+The project includes `vercel.json` and is set up for **Vercel**. To ship your code changes (e.g. taxes & fees UI, ePay amount):
+
+**Option A – Vercel linked to GitHub**
+1. Commit and push to your main branch:
+   ```bash
+   git add .
+   git commit -m "Add taxes & fees support, ePay total includes fees"
+   git push origin main
+   ```
+2. Vercel will build and deploy automatically if the repo is connected.
+
+**Option B – Manual build and deploy**
+1. Build locally:
+   ```bash
+   npm run build
+   ```
+2. Deploy the `dist` folder to your host (Vercel CLI, Netlify, AWS S3, GitHub Pages, etc.).
+
+### 2. Extraction prompt and workflow (separate from app deploy)
+
+- **Vellum:** Use the prompt and schema in `vellum-extraction-prompt.json`. Copy or import it into your Vellum workflow so the model returns `quote.taxesAndFees`. No “deploy” from this repo—you update the workflow in Vellum.
+- **Make.com:** Point the scenario at the updated Vellum prompt (or the same schema). When Make.com pushes new quote JSON to GitHub, include the `quote.taxesAndFees` field so the deployed app can read it.
+
+### 3. Quote JSON and presentation URLs
+
+The app loads quote data from `/quotes/<id>.json` (files in `public/quotes/`). When Make.com (or your pipeline) adds or updates a quote file in this repo and the app is redeployed, the new or updated presentation URL will serve that data. Ensure the extracted JSON includes `quote.taxesAndFees` so the UI and ePay amount are correct.
 
 ## Development
 

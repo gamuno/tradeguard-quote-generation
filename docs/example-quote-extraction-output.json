@@ -1,0 +1,228 @@
+{
+  "client": {
+    "name": "LABORTECH SOLUTIONS, LLC",
+    "address": "123 Business Ave, Atlanta, GA 30309",
+    "industry": "Technology Consulting"
+  },
+  "agent": {
+    "name": "Garrett Amundsen",
+    "company": "TradeGuard Insurance",
+    "phone": "913-689-5474",
+    "email": "garrett@tradeguardins.com",
+    "address": "456 Insurance Blvd, Savannah, GA 31401",
+    "headshotUrl": "https://files.manuscdn.com/user_upload_by_module/session_file/97407341/VqAZctcWvQFYkypv.png"
+  },
+  "carrier": {
+    "name": "Travelers",
+    "amRating": "A++",
+    "financialStrength": "Superior"
+  },
+  "quote": {
+    "number": "TRV-2026-007654",
+    "date": "2026-02-15",
+    "validity": "thirty (30) days",
+    "effectiveDate": "06/01/2026 through 06/01/2027",
+    "expirationDate": "06/01/2027",
+    "taxesAndFees": 75
+  },
+  "branding": {
+    "primaryColor": "#FF5F46",
+    "logoUrl": "https://files.manuscdn.com/user_upload_by_module/session_file/97407341/MWFfXxmBoovFpYsV.png"
+  },
+  "webhook": {
+    "url": "https://hook.us2.make.com/w8rl7tx7kwakoheacif94hyb8eksd0hr",
+    "apiKey": "manus-quote-generation"
+  },
+  "summaries": {
+    "coverageStrengths": [
+      "Comprehensive Commercial General Liability with high limits.",
+      "Robust Property coverage including Business Personal Property and Equipment Breakdown.",
+      "Extensive Crime coverage for employee theft, forgery, and money/securities.",
+      "Includes Business Income and Extra Expense coverage for continuity.",
+      "Broad range of endorsements for specific needs."
+    ],
+    "considerations": [
+      "Policy proposal is not a binding contract of insurance.",
+      "Specific exclusions apply, such as for Digital Assets and certain types of pollution.",
+      "Property policy level deductible applies to certain coverages.",
+      "Coverage depends on actual policy provisions, not just the proposal."
+    ]
+  },
+  "policies": [
+    {
+      "id": "generalLiability",
+      "name": "Commercial General Liability",
+      "shortName": "GL",
+      "description": "Protects against third-party claims for bodily injury and property damage.",
+      "fullDescription": "Commercial General Liability coverage protects your business from claims of bodily injury or property damage to third parties, including premises liability, products-completed operations, and personal and advertising injury.",
+      "icon": "",
+      "color": "",
+      "premium": 339,
+      "paymentOptions": {
+        "totalPremium": 339,
+        "fullPay": {
+          "amount": 339,
+          "discountAmount": 0
+        },
+        "installments": {
+          "counts": [2, 4, 6, 10, 12],
+          "perInstallmentFee": 0,
+          "downPaymentPercent": 25
+        }
+      },
+      "limits": {
+        "generalAggregate": 2000000,
+        "productsCompletedOperationsAggregate": 2000000,
+        "eachOccurrence": 1000000,
+        "personalAndAdvertisingInjuryLiability": 1000000,
+        "damageToPremisesRentedToYou": 300000,
+        "medicalExpensesAnyOnePerson": 5000,
+        "total": 2000000
+      },
+      "deductibles": {},
+      "keyFeatures": [
+        "$2,000,000 General Aggregate limit.",
+        "$1,000,000 Each Occurrence limit.",
+        "Includes Personal and Advertising Injury Liability.",
+        "Coverage for Damage to Premises Rented to You up to $300,000.",
+        "Medical Expenses coverage for $5,000 per person."
+      ],
+      "coverageExamples": {
+        "covered": [
+          "A customer is injured on your business premises and files a lawsuit.",
+          "Your advertising causes reputational harm to a competitor.",
+          "Property damage occurs to a building you rent due to your negligence.",
+          "Medical expenses for a minor injury sustained by a visitor."
+        ],
+        "notCovered": [
+          "Employee injuries (covered by Workers' Compensation).",
+          "Professional errors or omissions.",
+          "Intentional acts causing harm.",
+          "Damage to your own business property."
+        ]
+      }
+    },
+    {
+      "id": "property",
+      "name": "Commercial Property",
+      "shortName": "Property",
+      "description": "Protects your business property and income from various perils.",
+      "fullDescription": "Commercial Property insurance covers your business's physical assets, including buildings, business personal property, and equipment, against perils like fire, wind, and theft.",
+      "icon": "",
+      "color": "",
+      "premium": 225,
+      "paymentOptions": {
+        "totalPremium": 225,
+        "fullPay": {
+          "amount": 225,
+          "discountAmount": 0
+        },
+        "installments": {
+          "counts": [2, 4, 6, 10, 12],
+          "perInstallmentFee": 0,
+          "downPaymentPercent": 25
+        }
+      },
+      "limits": {
+        "businessPersonalProperty": 20000,
+        "businessIncomeAndExtraExpense": 0,
+        "total": 500000
+      },
+      "deductibles": {
+        "wind": 1000,
+        "policyLevel": 1000
+      },
+      "keyFeatures": [
+        "Covers Business Personal Property with Replacement Cost valuation.",
+        "Includes Equipment Breakdown coverage.",
+        "Provides coverage for Electronic Data Processing equipment and media.",
+        "Includes Business Income and Extra Expense coverage."
+      ],
+      "coverageExamples": {
+        "covered": [
+          "Fire damages your office building and its contents.",
+          "A windstorm causes damage to your roof, requiring repairs.",
+          "Theft of business personal property from your premises."
+        ],
+        "notCovered": [
+          "Damage caused by flood (unless specifically endorsed).",
+          "Losses due to wear and tear or gradual deterioration.",
+          "Earthquake damage (unless specifically endorsed)."
+        ]
+      }
+    },
+    {
+      "id": "crime",
+      "name": "Crime Coverage",
+      "shortName": "Crime",
+      "description": "Protects against financial losses from criminal acts.",
+      "fullDescription": "Crime coverage protects your business from financial losses due to various criminal acts, including employee theft, forgery, and theft of money and securities.",
+      "icon": "",
+      "color": "",
+      "premium": 62,
+      "paymentOptions": {
+        "totalPremium": 62,
+        "fullPay": {
+          "amount": 62,
+          "discountAmount": 0
+        },
+        "installments": {
+          "counts": [2, 4, 6, 10, 12],
+          "perInstallmentFee": 0,
+          "downPaymentPercent": 25
+        }
+      },
+      "limits": {
+        "employeeTheft": 25000,
+        "forgeryOrAlteration": 25000,
+        "total": 25000
+      },
+      "deductibles": {
+        "crime": 1000
+      },
+      "keyFeatures": [
+        "Covers Employee Theft up to $25,000.",
+        "Protection against Forgery or Alteration.",
+        "Coverage for Money Orders and Counterfeit Paper Currency."
+      ],
+      "coverageExamples": {
+        "covered": [
+          "An employee embezzles funds from the company.",
+          "A check is forged, leading to financial loss.",
+          "Cash is stolen from the business premises."
+        ],
+        "notCovered": [
+          "Losses not directly resulting from criminal acts.",
+          "Losses exceeding the policy limits.",
+          "Losses below the deductible amount."
+        ]
+      }
+    }
+  ],
+  "comparisonMatrix": [
+    {
+      "coverageArea": "General Liability",
+      "policies": ["$1M/$2M", "N/A", "N/A"]
+    },
+    {
+      "coverageArea": "Property Coverage",
+      "policies": ["N/A", "$500K Building, $20K BPP", "N/A"]
+    },
+    {
+      "coverageArea": "Business Income & Extra Expense",
+      "policies": ["N/A", "Actual Loss for 12 Months", "N/A"]
+    },
+    {
+      "coverageArea": "Crime Coverage",
+      "policies": ["N/A", "N/A", "$25K Employee Theft"]
+    },
+    {
+      "coverageArea": "Deductible/Retention",
+      "policies": ["N/A", "$1K Wind, $1K Policy", "$1K Crime"]
+    },
+    {
+      "coverageArea": "Annual Premium",
+      "policies": ["$339", "$225", "$62"]
+    }
+  ]
+}
