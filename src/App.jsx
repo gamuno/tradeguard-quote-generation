@@ -66,6 +66,7 @@ function App() {
   const [showDeclineForm, setShowDeclineForm] = useState(false)
   const [submittingDecline, setSubmittingDecline] = useState(false)
   const [showDeclineSuccess, setShowDeclineSuccess] = useState(false)
+  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false)
 
   // FAQ state
   const [openFAQ, setOpenFAQ] = useState(null)
@@ -375,8 +376,8 @@ const handleDeclineSubmission = async () => {
       answer: "Changes can be made easily through your online account or by contacting your agent. Most coverage changes take effect within 24-48 hours. We'll provide you with updated documents and confirmation of all changes."
     },
     {
-      question: "What is CertAssist and how does it help my business?",
-      answer: "CertAssist is our proprietary technology that automates subcontractor compliance tracking. It automatically requests, validates, and follows up on Certificates of Insurance (COIs), saving you hours of administrative work and ensuring you're always compliant."
+      question: "What is TradeGuard Compliance and how does it help my business?",
+      answer: "TradeGuard Compliance is our proprietary technology that automates subcontractor compliance tracking. It automatically requests, validates, and follows up on Certificates of Insurance (COIs), saving you hours of administrative work and ensuring you're always compliant."
     },
     {
       question: "How quickly can I get a certificate of insurance?",
@@ -489,6 +490,27 @@ if (loadError || !data) {
 }
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+
+      {showPaymentSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8 text-center space-y-4">
+            <div className="flex justify-center">
+              <CheckCircle className="h-16 w-16 text-green-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900">Acceptance Submitted!</h2>
+            <p className="text-gray-600">
+              A member of the TradeGuard team will be reaching out shortly to collect payment details.
+            </p>
+            <Button
+              className="w-full bg-[#FF5F46] hover:bg-[#FF5F46]/90"
+              onClick={() => setShowPaymentSuccess(false)}
+            >
+              Close
+            </Button>
+          </div>
+        </div>
+      )}
+
 {/* Header */}
 <header className="bg-white shadow-sm border-b">
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1225,9 +1247,18 @@ if (loadError || !data) {
 
   await fetch("https://hook.us2.make.com/cp8w96rcmfwweegdrnqrxfu9ds3jfufh", {
     method: "POST",
-    headers: { "Content-Type": "text/plain" },
-    body: comments
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "TradeGuard Payment",
+      clientName: data.client.name,
+      decision: "accept",
+      selectedPolicies: selectedPolicyNames,
+      paymentPlan: planLabel,
+      totalDue: toUSDString(amountWithTaxesAndFees),
+      quoteId: quoteId
+    })
   });
+  setShowPaymentSuccess(true);
 }}
 
 >
@@ -1384,8 +1415,8 @@ if (loadError || !data) {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    Our CertAssist tool automates subcontractor compliance tracking, making it effortless to request, 
-                    validate, and follow up on all Certificate of Insurance issues. We provide enterprise-level 
+                    Our TradeGuard Compliance tool automates subcontractor compliance tracking, making it effortless to request,
+                    validate, and follow up on all Certificate of Insurance issues. We provide enterprise-level
                     technology at a fraction of the cost of other vendors.
                   </p>
                 </CardContent>
