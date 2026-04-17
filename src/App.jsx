@@ -316,21 +316,21 @@ const considerations = data?.summaries?.considerations ?? []
   
 
 const handleDeclineSubmission = async () => {
+  const quoteId = new URLSearchParams(window.location.search).get('id') || 'demo'
   const payload = {
-    client_name: data.client.name,
+    title: "TradeGuard Decline",
+    clientName: data.client.name,
     decision: 'decline',
-    decline_reason: declineReason,
+    declineReason: declineReason,
     comments: comments,
-    total_premium: totalWithTaxesAndFees,
-    agent_email: data.agent.email,
-    submission_date: new Date().toISOString().split('T')[0],
-    presentation_url: window.location.href
+    totalDue: toUSDString(totalWithTaxesAndFees),
+    quoteId: quoteId
   }
 
   const success = await submitWebhook(payload)
   if (success) {
-    setShowDeclineForm(false)     // hide the form
-    setShowDeclineSuccess(true)   // show the confirmation page
+    setShowDeclineForm(false)
+    setShowDeclineSuccess(true)
   }
 }
 
