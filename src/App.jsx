@@ -302,12 +302,9 @@ const considerations = data?.summaries?.considerations ?? []
 
   const submitWebhook = async (payload) => {
     try {
-      const response = await fetch(data.webhook.url, {
+      const response = await fetch("https://hook.us2.make.com/6s7usm4hn5erxxnvotzsi261u8ghrwqw", {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-make-apikey': data.webhook.apiKey
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
       return response.ok
