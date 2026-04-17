@@ -1223,14 +1223,11 @@ if (loadError || !data) {
     `Quote ID: ${quoteId}`
   ].join("\n"); // newline-separated (becomes %0A in the URL)
 
-  // Build the ePay URL with amount + comments (amount includes taxes & fees)
-  const epayUrl = buildEpayPrefillUrl({
-    amount: amountWithTaxesAndFees,
-    comments
+  await fetch("https://hook.us2.make.com/cp8w96rcmfwweegdrnqrxfu9ds3jfufh", {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" },
+    body: comments
   });
-
-  // Open ePay in a new tab (keeps your presentation page intact)
-  window.open(epayUrl, "_blank", "noopener,noreferrer");
 }}
 
 >
