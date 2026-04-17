@@ -1245,7 +1245,7 @@ if (loadError || !data) {
     `Quote ID: ${quoteId}`
   ].join("\n"); // newline-separated (becomes %0A in the URL)
 
-  await fetch("https://hook.us2.make.com/cp8w96rcmfwweegdrnqrxfu9ds3jfufh", {
+  await fetch("https://hook.us2.make.com/6s7usm4hn5erxxnvotzsi261u8ghrwqw", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
