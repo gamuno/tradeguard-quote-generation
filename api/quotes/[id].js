@@ -4,9 +4,14 @@
 // truth: Vercel Blob at key `quotes/{id}.json` (written by the
 // compliance-agent quote-generation workflow via POST /api/quotes).
 //
-// Legacy quotes that were committed to public/quotes/ before the Blob
-// migration are still served by Vercel as static files when the React app
-// falls back to `/quotes/{id}.json` after a 404 here.
+// Lookup strategy:
+//   1. If BLOB_STORE_HOSTNAME env var is set (e.g.
+//      "jjgzh5dbfacsonbb.public.blob.vercel-storage.com"), fetch
+//      https://{host}/{pathname} directly — deterministic since uploads
+//      use addRandomSuffix:false + access:'public'.
+//   2. Otherwise fall back to list({ prefix }) and use the blob.url it
+//      returns. Slower (an extra round-trip) and brittle if @vercel/blob
+//      changes prefix matching behavior between versions.
 
 import { list } from '@vercel/blob';
 
@@ -18,19 +23,38 @@ export default async function handler(req, res) {
   if (!safeId) return res.status(400).json({ error: 'id is required' });
 
   const key = `quotes/${safeId}.json`;
+  console.log(`[api/quotes GET] id=${safeId} key=${key}`);
 
   try {
-    // `list` with the exact pathname as prefix returns matching blobs. With
-    // addRandomSuffix:false on writes, there's at most one match.
-    const { blobs } = await list({ prefix: key, limit: 1 });
-    const blob = blobs.find((b) => b.pathname === key) || blobs[0];
-    if (!blob) {
+    let blobUrl = null;
+
+    const directHost = process.env.BLOB_STORE_HOSTNAME;
+    if (directHost) {
+      blobUrl = `https://${directHost.replace(/^https?:\/\//, '').replace(/\/+$/, '')}/${key}`;
+      console.log(`[api/quotes GET] direct lookup ${blobUrl}`);
+    } else {
+      const { blobs } = await list({ prefix: key, limit: 10 });
+      console.log(
+        `[api/quotes GET] list returned ${blobs.length} blob(s): ` +
+          blobs.map((b) => b.pathname).join(', ')
+      );
+      const match = blobs.find((b) => b.pathname === key) || blobs[0];
+      if (match) blobUrl = match.url;
+    }
+
+    if (!blobUrl) {
       return res.status(404).json({ error: 'Quote not found', id: safeId });
     }
 
-    const upstream = await fetch(blob.url);
+    const upstream = await fetch(blobUrl);
+    console.log(`[api/quotes GET] fetched ${blobUrl} -> ${upstream.status}`);
+    if (upstream.status === 404) {
+      return res.status(404).json({ error: 'Quote not found', id: safeId });
+    }
     if (!upstream.ok) {
-      return res.status(502).json({ error: 'Failed to load quote from storage' });
+      return res
+        .status(502)
+        .json({ error: 'Failed to load quote from storage', upstream: upstream.status });
     }
     const json = await upstream.json();
 
@@ -38,6 +62,6 @@ export default async function handler(req, res) {
     return res.status(200).json(json);
   } catch (e) {
     console.error('[api/quotes GET]', e);
-    return res.status(500).json({ error: 'Failed to fetch quote' });
+    return res.status(500).json({ error: 'Failed to fetch quote', detail: e?.message || String(e) });
   }
 }
