@@ -300,9 +300,16 @@ const considerations = data?.summaries?.considerations ?? []
       .reduce((sum, policy) => sum + policy.premium, 0)
   }
 
+  // POST quote accept/decline payloads to the TradeGuard compliance-agent
+  // server. Configure VITE_TRADEGUARD_API_URL in the Vercel project to point
+  // at the live server (e.g. https://tradeguard-compliance-agent.onrender.com).
+  const QUOTE_DECISION_ENDPOINT =
+    (import.meta.env.VITE_TRADEGUARD_API_URL?.replace(/\/$/, '') || '') +
+    '/webhook/quote-payment-decision'
+
   const submitWebhook = async (payload) => {
     try {
-      const response = await fetch("https://hook.us2.make.com/6s7usm4hn5erxxnvotzsi261u8ghrwqw", {
+      const response = await fetch(QUOTE_DECISION_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -1242,7 +1249,7 @@ if (loadError || !data) {
     `Quote ID: ${quoteId}`
   ].join("\n"); // newline-separated (becomes %0A in the URL)
 
-  await fetch("https://hook.us2.make.com/6s7usm4hn5erxxnvotzsi261u8ghrwqw", {
+  await fetch(QUOTE_DECISION_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
