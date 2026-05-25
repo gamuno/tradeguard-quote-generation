@@ -94,10 +94,20 @@ useEffect(() => {
 
       // Try the Blob-backed API first (new quotes). Fall back to the static
       // file at /quotes/{id}.json so historical quotes committed to
-      // public/quotes/ keep working without re-generation.
+      // public/quotes/ keep working without re-generation. Treat a non-JSON
+      // response (e.g. the Vercel catch-all rewrite returning the SPA HTML)
+      // as a miss, not a hard error.
       const tryFetch = async (url) => {
-        const r = await fetch(url, { headers: { Accept: 'application/json' } });
-        return r.ok ? r.json() : null;
+        try {
+          const r = await fetch(url, { headers: { Accept: 'application/json' } });
+          if (!r.ok) return null;
+          const ctype = r.headers.get('content-type') || '';
+          if (!ctype.includes('application/json')) return null;
+          return await r.json();
+        } catch (err) {
+          console.warn('[quote load]', url, err);
+          return null;
+        }
       };
       const json =
         (await tryFetch(`/api/quotes/${encodeURIComponent(id)}`)) ||
