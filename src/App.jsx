@@ -92,12 +92,17 @@ useEffect(() => {
       const id = urlId || (isDev ? 'demo' : null);
       if (!id) throw new Error('Missing id');
 
-      const res = await fetch(`/quotes/${encodeURIComponent(id)}.json`, {
-        headers: { Accept: 'application/json' },
-      });
-      if (!res.ok) throw new Error('NOT_FOUND');
-
-      const json = await res.json();
+      // Try the Blob-backed API first (new quotes). Fall back to the static
+      // file at /quotes/{id}.json so historical quotes committed to
+      // public/quotes/ keep working without re-generation.
+      const tryFetch = async (url) => {
+        const r = await fetch(url, { headers: { Accept: 'application/json' } });
+        return r.ok ? r.json() : null;
+      };
+      const json =
+        (await tryFetch(`/api/quotes/${encodeURIComponent(id)}`)) ||
+        (await tryFetch(`/quotes/${encodeURIComponent(id)}.json`));
+      if (!json) throw new Error('NOT_FOUND');
       setData(json);
       setLoadError(null);
     } catch (e) {
