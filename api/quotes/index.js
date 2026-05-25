@@ -46,7 +46,6 @@ export default async function handler(req, res) {
       access: 'public',
       addRandomSuffix: false,
       contentType: 'application/json',
-      allowOverwrite: true,
     });
 
     const base = process.env.PUBLIC_BASE_URL || `https://${req.headers.host}`;
@@ -55,6 +54,13 @@ export default async function handler(req, res) {
     return res.status(201).json({ id, url: blob.url, shareUrl });
   } catch (e) {
     console.error('[api/quotes POST]', e);
-    return res.status(500).json({ error: 'Failed to save quote' });
+    // Surface the actual error so the compliance-agent's failure log shows
+    // the real cause (missing BLOB_READ_WRITE_TOKEN, name conflict, etc.)
+    // instead of a generic 500.
+    return res.status(500).json({
+      error: 'Failed to save quote',
+      detail: e?.message || String(e),
+      code: e?.code || null,
+    });
   }
 }
