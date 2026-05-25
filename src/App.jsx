@@ -92,12 +92,17 @@ useEffect(() => {
       const id = urlId || (isDev ? 'demo' : null);
       if (!id) throw new Error('Missing id');
 
-      const res = await fetch(`/quotes/${encodeURIComponent(id)}.json`, {
-        headers: { Accept: 'application/json' },
-      });
-      if (!res.ok) throw new Error('NOT_FOUND');
-
-      const json = await res.json();
+      // Try the Blob-backed API first (new quotes). Fall back to the static
+      // file at /quotes/{id}.json so historical quotes committed to
+      // public/quotes/ keep working without re-generation.
+      const tryFetch = async (url) => {
+        const r = await fetch(url, { headers: { Accept: 'application/json' } });
+        return r.ok ? r.json() : null;
+      };
+      const json =
+        (await tryFetch(`/api/quotes/${encodeURIComponent(id)}`)) ||
+        (await tryFetch(`/quotes/${encodeURIComponent(id)}.json`));
+      if (!json) throw new Error('NOT_FOUND');
       setData(json);
       setLoadError(null);
     } catch (e) {
@@ -300,9 +305,16 @@ const considerations = data?.summaries?.considerations ?? []
       .reduce((sum, policy) => sum + policy.premium, 0)
   }
 
+  // POST quote accept/decline payloads to the TradeGuard compliance-agent
+  // server. Configure VITE_TRADEGUARD_API_URL in the Vercel project to point
+  // at the live server (e.g. https://tradeguard-compliance-agent.onrender.com).
+  const QUOTE_DECISION_ENDPOINT =
+    (import.meta.env.VITE_TRADEGUARD_API_URL?.replace(/\/$/, '') || '') +
+    '/webhook/quote-payment-decision'
+
   const submitWebhook = async (payload) => {
     try {
-      const response = await fetch("https://hook.us2.make.com/6s7usm4hn5erxxnvotzsi261u8ghrwqw", {
+      const response = await fetch(QUOTE_DECISION_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -1242,7 +1254,7 @@ if (loadError || !data) {
     `Quote ID: ${quoteId}`
   ].join("\n"); // newline-separated (becomes %0A in the URL)
 
-  await fetch("https://hook.us2.make.com/6s7usm4hn5erxxnvotzsi261u8ghrwqw", {
+  await fetch(QUOTE_DECISION_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
